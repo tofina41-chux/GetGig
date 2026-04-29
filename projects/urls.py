@@ -10,4 +10,5 @@ urlpatterns = [
     path('apply/<int:project_id>/', views.apply_to_project, name='apply_to_project'),
     path('application/<int:app_id>/status/<str:status>/', views.update_application_status, name='update_status'),
     path('my-bids/', views.freelancer_bids, name='my_bids'),
+    path('application/<int:application_id>/vet/<str:status>/', views.vet_application, name='vet_application'),
 ]

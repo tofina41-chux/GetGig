@@ -2,6 +2,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Project, Application
 from .forms import ProjectForm, ApplicationForm
+from users.models import Notification # Import your Notification model
+from django.contrib.admin.views.decorators import staff_member_required # If you want admin only
+# Or just use login_required if any client can vet their own projects
 
 @login_required
 def client_dashboard(request):
@@ -46,7 +49,7 @@ def apply_to_project(request, project_id):
 
     # Optional: Check if already applied
     if Application.objects.filter(project=project, freelancer=request.user).exists():
-        # You could add a django message here "Already applied!"
+        # Optional: messages.info(request, "You have already applied for this gig.")
         return redirect('projects:freelancer_dashboard')
 
     if request.method == 'POST':
@@ -56,12 +59,20 @@ def apply_to_project(request, project_id):
             application.project = project
             application.freelancer = request.user
             application.save()
+
+            # --- NEW NOTIFICATION LOGIC ---
+            # Notify the client (the person who posted the project)
+            Notification.objects.create(
+                user=project.client, # The client
+                message=f"New application from {request.user.username} for your project: '{project.title}'."
+            )
+            # ------------------------------
+
             return redirect('projects:freelancer_dashboard')
     else:
         form = ApplicationForm()
     
     return render(request, 'freelancers/apply.html', {'form': form, 'project': project})
-
 
 
 @login_required
@@ -88,3 +99,27 @@ def freelancer_bids(request):
     
     bids = Application.objects.filter(freelancer=request.user).select_related('project')
     return render(request, 'freelancers/my_bids.html', {'bids': bids})
+
+
+@login_required
+def vet_application(request, application_id, status):
+    application = get_object_or_404(Application, id=application_id)
+    
+    # Security: Only the project owner can vet applications
+    # (Update '.client' below to match your Project model attribute)
+    if application.project.client != request.user:
+        messages.error(request, "You are not authorized to vet this application.")
+        return redirect('projects:client_dashboard')
+
+    if status in ['approved', 'rejected']:
+        application.status = status
+        application.save()
+        
+        # Notify the Freelancer
+        Notification.objects.create(
+            user=application.freelancer,
+            message=f"Update: Your application for '{application.project.title}' has been {status}."
+        )
+        messages.success(request, f"Application {status} successfully.")
+    
+    return redirect('projects:client_dashboard')

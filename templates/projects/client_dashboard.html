@@ -1,0 +1,11 @@
+<div class="flex space-x-2">
+    <a href="{% url 'projects:vet_application' application.id 'approved' %}" 
+       class="bg-[#10b981] hover:bg-[#059669] text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow-sm">
+        Approve
+    </a>
+
+    <a href="{% url 'projects:vet_application' application.id 'rejected' %}" 
+       class="bg-white border border-red-200 text-red-600 hover:bg-red-50 px-4 py-2 rounded-lg text-sm font-medium transition">
+        Reject
+    </a>
+</div>
