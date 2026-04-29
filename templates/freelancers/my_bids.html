@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 class="text-3xl font-bold mb-8 text-gray-800">My Proposals</h1>
+
+<div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+    <table class="w-full text-left border-collapse">
+        <thead class="bg-slate-50 border-b border-gray-100">
+            <tr>
+                <th class="p-4 font-bold text-gray-600">Project</th>
+                <th class="p-4 font-bold text-gray-600">Bid</th>
+                <th class="p-4 font-bold text-gray-600">Date</th>
+                <th class="p-4 font-bold text-gray-600">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for bid in bids %}
+            <tr class="border-b border-gray-50 hover:bg-slate-50 transition">
+                <td class="p-4 font-semibold text-ocean">{{ bid.project.title }}</td>
+                <td class="p-4">${{ bid.bid_amount }}</td>
+                <td class="p-4 text-gray-400 text-sm">{{ bid.created_at|date:"M d, Y" }}</td>
+                <td class="p-4">
+                    <span class="px-3 py-1 rounded-full text-xs font-bold uppercase 
+                        {% if bid.status == 'accepted' %}bg-green-100 text-mint
+                        {% elif bid.status == 'rejected' %}bg-red-100 text-red-500
+                        {% else %}bg-blue-100 text-ocean{% endif %}">
+                        {{ bid.status }}
+                    </span>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="p-8 text-center text-gray-400">You haven't applied to any gigs yet.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

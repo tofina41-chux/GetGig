@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto py-10">
+    <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+        <div class="bg-[#0C6FBD] p-8 text-white">
+            <h2 class="text-3xl font-extrabold tracking-tight">Profile Settings</h2>
+            <p class="text-blue-100 mt-2">Update your personal information and how you appear to others.</p>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="p-8 space-y-8">
+            {% csrf_token %}
+            
+            <div class="flex items-center space-x-8 pb-8 border-b border-gray-100">
+                <div class="relative">
+                    {% if user.profile_image %}
+                        <img src="{{ user.profile_image.url }}" class="w-32 h-32 rounded-2xl object-cover border-4 border-gray-50 shadow-md">
+                    {% else %}
+                        <div class="w-32 h-32 rounded-2xl bg-blue-50 text-[#0C6FBD] flex items-center justify-center text-3xl font-bold border-4 border-gray-50">
+                            {{ user.username|first|upper }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="flex-grow">
+                    <label class="block text-sm font-bold text-gray-700 uppercase tracking-wider mb-2">Profile Photo</label>
+                    {{ form.profile_image }}
+                    <p class="text-xs text-gray-400 mt-2">Recommended: Square JPG or PNG, max 300x300px.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {% for field in form %}
+                    {% if field.name != 'profile_image' %}
+                        <div class="flex flex-col space-y-2 {% if field.name == 'bio' %}md:col-span-2{% endif %}">
+                            <label class="text-sm font-bold text-gray-600 uppercase tracking-wide">
+                                {{ field.label }}
+                            </label>
+                            {{ field }}
+                            {% if field.errors %}
+                                {% for error in field.errors %}
+                                    <span class="text-red-500 text-xs font-semibold">{{ error }}</span>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            <div class="pt-6">
+                <button type="submit" 
+                        class="w-full bg-[#0C6FBD] text-white font-bold py-4 rounded-xl shadow-lg hover:bg-blue-700 hover:-translate-y-0.5 transition-all active:scale-[0.98]">
+                    Save Profile Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
