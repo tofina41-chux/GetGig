@@ -1,13 +1,16 @@
+{% load static %}
+{% load pwa %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {% load pwa %}
+    
     {% progressive_web_app_meta %}
+    
     <title>GetGig | Social Freelancing</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="manifest" href="/static/manifest.json">
+    
     <script>
         tailwind.config = {
             theme: {
@@ -28,7 +31,10 @@
 <body class="bg-slate-50 min-h-screen flex flex-col">
     <nav class="bg-white border-b border-gray-200 p-4 shadow-sm">
         <div class="container mx-auto flex justify-between items-center">
-            <a href="/" class="text-2xl font-bold text-ocean">GetGig<span class="text-mint">.</span></a>
+            <a href="/" class="flex items-center space-x-2">
+                <img src="{% static 'images/logo.png' %}" alt="GetGig Logo" class="h-10 w-auto rounded-md">
+                <span class="text-2xl font-bold text-[#0c4a6e] tracking-tight">GetGig</span>
+            </a>
             
             <div class="flex items-center space-x-6 font-medium text-gray-600">
                 {% if user.is_authenticated %}
@@ -40,15 +46,24 @@
                         <a href="{% url 'projects:create_project' %}" class="hover:text-ocean">Post Gig</a>
                     {% endif %}
 
+                    <a href="{% url 'users:notifications' %}" class="text-gray-600 hover:text-blue-600 relative">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                        </svg>
+                        {% if user.has_unread_notifications %}
+                            <span class="absolute top-0 right-0 block h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white"></span>
+                        {% endif %}
+                    </a>
+
                     <a href="{% url 'users:edit_profile' %}" class="flex items-center space-x-3 group border-l pl-6 border-gray-100">
                         {% if user.profile_image %}
-                            <img src="{{ user.profile_image.url }}" class="w-14 h-14 rounded-full object-cover border-2 border-[#0C6FBD] group-hover:border-mint transition shadow-sm">
+                            <img src="{{ user.profile_image.url }}" class="w-10 h-10 rounded-full object-cover border-2 border-[#0C6FBD] group-hover:border-mint transition shadow-sm">
                         {% else %}
-                            <div class="w-14 h-14 rounded-full bg-[#0C6FBD] text-white flex items-center justify-center font-bold shadow-sm group-hover:bg-blue-700 transition">
+                            <div class="w-10 h-10 rounded-full bg-[#0C6FBD] text-white flex items-center justify-center font-bold shadow-sm group-hover:bg-blue-700 transition">
                                 {{ user.username|first|upper }}
                             </div>
                         {% endif %}
-                        <span class="font-bold text-gray-800">{{ user.username }}</span>
+                        <span class="font-bold text-gray-800 hidden md:inline">{{ user.username }}</span>
                     </a>
 
                     <form action="{% url 'logout' %}" method="post" class="inline">
@@ -63,18 +78,6 @@
                 {% endif %}
             </div>
         </div>
-<div class="flex items-center space-x-4">
-    <a href="{% url 'users:notifications' %}" class="text-gray-600 hover:text-blue-600 relative">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-        </svg>
-        {% if user.notifications.all %}
-    {% if any_unread %} {% endif %}
-{% endif %}
-    </a>
-    
-    <spa n class="text-sm font-medium text-gray-700">{{ user.username }}</span>
-</div>
     </nav>
 
     <div class="container mx-auto p-6 flex-grow">
@@ -92,5 +95,17 @@
     <footer class="bg-white border-t border-gray-200 p-8 text-center text-gray-500">
         &copy; 2026 GetGig Platform. Built for the Win.
     </footer>
+
+    <script type="text/javascript">
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/serviceworker.js', {
+                scope: '/'
+            }).then(function (registration) {
+                console.log('Django PWA: ServiceWorker registration successful with scope: ', registration.scope);
+            }, function (err) {
+                console.log('Django PWA: ServiceWorker registration failed: ', err);
+            });
+        }
+    </script>
 </body>
 </html>
