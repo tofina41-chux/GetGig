@@ -34,3 +34,11 @@ def edit_profile(request):
     else:
         form = ProfileUpdateForm(instance=request.user)
     return render(request, 'users/edit_profile.html', {'form': form})
+
+
+@login_required
+def notifications_view(request):
+    notifications = request.user.notifications.all()
+    # Mark all as read when they view the page
+    notifications.update(is_read=True)
+    return render(request, 'users/notifications.html', {'notifications': notifications})

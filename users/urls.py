@@ -8,4 +8,5 @@ urlpatterns = [
     path('dashboard/', views.dashboard_redirect, name='dashboard_redirect'),
     path('profile/edit/', views.edit_profile, name='edit_profile'), # This is the "edit_profile" part
     path('', include('pwa.urls')),
+    path('notifications/', views.notifications_view, name='notifications'),
 ]
