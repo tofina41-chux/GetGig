@@ -4,7 +4,7 @@ from .models import Project, Application
 class ProjectForm(forms.ModelForm):
     class Meta:
         model = Project
-        fields = ['title', 'description', 'budget', 'deadline']
+        fields = ['title', 'description', 'budget', 'deadline', 'image']
         widgets = {
             'deadline': forms.DateInput(attrs={'type': 'date'}),
         }

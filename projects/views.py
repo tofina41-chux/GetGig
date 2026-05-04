@@ -29,7 +29,7 @@ def freelancer_dashboard(request):
 @login_required
 def create_project(request):
     if request.method == 'POST':
-        form = ProjectForm(request.POST)
+        form = ProjectForm(request.POST, request.FILES) # Don't forget to handle file uploads
         if form.is_valid():
             project = form.save(commit=False)
             project.client = request.user

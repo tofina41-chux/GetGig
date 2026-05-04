@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="relative isolate overflow-hidden bg-white">
+    <!-- Soft Gradient Background -->
+    <div class="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80">
+        <div class="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-mint to-ocean opacity-20 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"></div>
+    </div>
+
+    <div class="mx-auto max-w-7xl px-6 pb-24 pt-10 sm:pb-32 lg:flex lg:px-8 lg:py-40">
+        <div class="mx-auto max-w-2xl flex-shrink-0 lg:mx-0 lg:max-w-xl lg:pt-8">
+            <!-- New Badge -->
+            <div class="mt-24 sm:mt-32 lg:mt-16">
+                <a href="#" class="inline-flex space-x-6">
+                    <span class="rounded-full bg-ocean/10 px-3 py-1 text-sm font-semibold leading-6 text-ocean ring-1 ring-inset ring-ocean/20">What's new</span>
+                    <span class="inline-flex items-center space-x-2 text-sm font-medium leading-6 text-gray-600">
+                        <span>Just won 1st Place!</span>
+                    </span>
+                </a>
+            </div>
+            
+            <h1 class="mt-10 text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
+                The future of <span class="text-transparent bg-clip-text bg-gradient-to-r from-ocean to-mint">Social Freelancing.</span>
+            </h1>
+            <p class="mt-6 text-lg leading-8 text-gray-600">
+                GetGig connects elite talent with visionary clients. No bidding wars, just high-quality matches powered by a community that cares.
+            </p>
+            <div class="mt-10 flex items-center gap-x-6">
+                <a href="{% url 'users:register' %}" class="rounded-2xl bg-ocean px-8 py-4 text-sm font-semibold text-white shadow-lg hover:bg-blue-700 transition-all transform hover:scale-105">
+                    Start Earning
+                </a>
+                <a href="#features" class="text-sm font-semibold leading-6 text-gray-900">Learn more <span aria-hidden="true">→</span></a>
+            </div>
+        </div>
+
+        <!-- Hero Illustration/Image Placeholder -->
+        <div class="mx-auto mt-16 flex max-w-2xl sm:mt-24 lg:ml-10 lg:mr-0 lg:mt-0 lg:max-w-none lg:flex-none xl:ml-32">
+            <div class="max-w-3xl flex-none sm:max-w-5xl lg:max-w-none">
+                <div class="rounded-3xl bg-gray-900/5 p-2 ring-1 ring-inset ring-gray-900/10 lg:-m-4 lg:rounded-4xl lg:p-4">
+                    <!-- This is where a screenshot of your beautiful dashboard will go -->
+                    <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=2426&q=80" 
+     alt="GetGig Dashboard" 
+     class="w-[76rem] rounded-2xl shadow-2xl ring-1 ring-gray-900/10">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Simple Feature Section -->
+<div id="features" class="py-24 bg-slate-50">
+    <div class="mx-auto max-w-7xl px-6 lg:px-8">
+        <div class="mx-auto max-w-2xl text-center">
+            <h2 class="text-base font-semibold leading-7 text-mint">Deploy Faster</h2>
+            <p class="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Everything you need to scale your freelance business.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

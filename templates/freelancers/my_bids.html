@@ -1,36 +1,37 @@
 {% extends 'base.html' %}
-{% block content %}
-<h1 class="text-3xl font-bold mb-8 text-gray-800">My Proposals</h1>
 
-<div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
-    <table class="w-full text-left border-collapse">
-        <thead class="bg-slate-50 border-b border-gray-100">
-            <tr>
-                <th class="p-4 font-bold text-gray-600">Project</th>
-                <th class="p-4 font-bold text-gray-600">Bid</th>
-                <th class="p-4 font-bold text-gray-600">Date</th>
-                <th class="p-4 font-bold text-gray-600">Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for bid in bids %}
-            <tr class="border-b border-gray-50 hover:bg-slate-50 transition">
-                <td class="p-4 font-semibold text-ocean">{{ bid.project.title }}</td>
-                <td class="p-4">${{ bid.bid_amount }}</td>
-                <td class="p-4 text-gray-400 text-sm">{{ bid.created_at|date:"M d, Y" }}</td>
-                <td class="p-4">
-                    <span class="px-3 py-1 rounded-full text-xs font-bold uppercase 
-                        {% if bid.status == 'accepted' %}bg-green-100 text-mint
-                        {% elif bid.status == 'rejected' %}bg-red-100 text-red-500
-                        {% else %}bg-blue-100 text-ocean{% endif %}">
-                        {{ bid.status }}
-                    </span>
-                </td>
-            </tr>
-            {% empty %}
-            <tr><td colspan="4" class="p-8 text-center text-gray-400">You haven't applied to any gigs yet.</td></tr>
-            {% endfor %}
-        </tbody>
-    </table>
+{% block content %}
+<div class="mb-12">
+    <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight">My Active Bids</h1>
+    <p class="text-lg text-gray-500 mt-2">Track the status of your project proposals.</p>
+</div>
+
+<div class="grid gap-6">
+    {% for bid in bids %}
+    <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm flex flex-col md:flex-row items-center justify-between hover:shadow-md transition">
+        <div class="flex-grow">
+            <div class="flex items-center space-x-3 mb-2">
+                <h3 class="text-xl font-bold text-gray-900">{{ bid.project.title }}</h3>
+                <!-- Status Badge -->
+                {% if bid.status == 'approved' or bid.status == 'accepted' %}
+                    <span class="px-3 py-1 bg-green-50 text-mint text-xs font-bold rounded-full uppercase">Approved</span>
+                {% elif bid.status == 'rejected' %}
+                    <span class="px-3 py-1 bg-red-50 text-red-500 text-xs font-bold rounded-full uppercase">Declined</span>
+                {% else %}
+                    <span class="px-3 py-1 bg-blue-50 text-ocean text-xs font-bold rounded-full uppercase">Pending</span>
+                {% endif %}
+            </div>
+            <p class="text-gray-500 text-sm">Bid Amount: <span class="font-bold text-gray-800">${{ bid.bid_amount }}</span> • Submitted {{ bid.created_at|timesince }} ago</p>
+        </div>
+        
+        <div class="mt-4 md:mt-0">
+            <a href="{% url 'projects:freelancer_dashboard' %}" class="text-sm font-bold text-ocean hover:underline">View Project Details →</a>
+        </div>
+    </div>
+    {% empty %}
+    <div class="text-center py-20 bg-slate-50 rounded-[3rem] border-2 border-dashed border-gray-200">
+        <p class="text-gray-400 font-medium">You haven't placed any bids yet. Go find some work!</p>
+    </div>
+    {% endfor %}
 </div>
 {% endblock %}

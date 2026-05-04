@@ -2,16 +2,15 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from django.views.generic import RedirectView # Add this import
+from django.views.generic import TemplateView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('users/', include('users.urls')),
     path('projects/', include('projects.urls')),
-    path('', RedirectView.as_view(pattern_name='users:dashboard_redirect', permanent=False)),
+    path('', TemplateView.as_view(template_name='landing.html'), name='home'),
     # This adds the login/logout views automatically
     path('accounts/', include('django.contrib.auth.urls')), 
-    path('', RedirectView.as_view(pattern_name='users:dashboard_redirect', permanent=False)),
 ]
 
 if settings.DEBUG:
