@@ -1,47 +1,40 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="max-w-3xl mx-auto py-12">
-    <div class="bg-white p-10 rounded-[2.5rem] shadow-xl border border-gray-100">
-        <h1 class="text-3xl font-black text-gray-900 mb-8">Post a New Gig</h1>
+<div class="max-w-3xl mx-auto">
+    <div class="mb-10 text-center">
+        <h1 class="text-4xl font-black text-gray-900 tracking-tight">
+            {% if editing %}Edit Your Gig{% else %}Post a New Gig{% endif %}
+        </h1>
+        <p class="text-gray-500 mt-2">Set your requirements and find the perfect talent.</p>
+    </div>
 
-        <!-- Added enctype for image support -->
-        <form method="POST" enctype="multipart/form-data" class="space-y-6">
-            {% csrf_token %}
-            
-            {% for field in form %}
+    <form method="POST" enctype="multipart/form-data" class="bg-white p-10 rounded-[2.5rem] shadow-xl shadow-blue-50 border border-gray-100 space-y-6">
+        {% csrf_token %}
+        
+        {% for field in form %}
             <div class="space-y-2">
-                <label class="block text-sm font-bold text-gray-700 ml-1">{{ field.label }}</label>
-                
-                {% if field.name == 'image' %}
-                    <!-- Custom Styled File Input -->
-                    <div class="relative group">
-                        <div class="w-full h-32 border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center group-hover:border-ocean transition bg-gray-50">
-                            <svg class="w-8 h-8 text-gray-400 group-hover:text-ocean mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                            <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Click to upload project cover</span>
-                            {{ field }}
-                        </div>
-                    </div>
-                {% else %}
-                    {{ field }}
+                <label class="text-sm font-black text-gray-400 uppercase tracking-widest px-1">
+                    {{ field.label }}
+                </label>
+                {{ field }}
+                {% if field.help_text %}
+                    <p class="text-xs text-ocean/60 italic px-1">{{ field.help_text }}</p>
+                {% endif %}
+                {% if field.errors %}
+                    <p class="text-xs text-red-500">{{ field.errors.0 }}</p>
                 {% endif %}
             </div>
-            {% endfor %}
+        {% endfor %}
 
-            <button type="submit" class="w-full bg-ocean text-white py-5 rounded-2xl font-black text-lg shadow-lg hover:bg-blue-700 transition-all transform hover:-translate-y-1">
-                Launch Project
+        <div class="pt-6">
+            <button type="submit" class="w-full bg-ocean text-white py-5 rounded-2xl font-bold text-lg hover:bg-blue-700 transition-all transform hover:scale-[1.02] shadow-lg shadow-blue-100">
+                {% if editing %}Update Project{% else %}Launch Project{% endif %}
             </button>
-        </form>
-    </div>
+            <a href="{% url 'projects:client_dashboard' %}" class="block text-center mt-4 text-gray-400 font-bold hover:text-gray-600 transition">
+                Cancel
+            </a>
+        </div>
+    </form>
 </div>
-
-<style>
-    /* Hides the ugly "No file chosen" text but keeps the button functional */
-    input[type="file"] {
-        @apply absolute inset-0 opacity-0 cursor-pointer !important;
-    }
-    input, textarea, select {
-        @apply w-full p-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-ocean transition text-gray-700 !important;
-    }
-</style>
 {% endblock %}

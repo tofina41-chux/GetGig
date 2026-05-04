@@ -14,70 +14,119 @@
 <div class="space-y-10">
     {% for project in projects %}
         <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
+            
             <!-- Project Header -->
             <div class="p-8 bg-slate-50/50 border-b border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div>
-                    <h3 class="text-2xl font-bold text-ocean">{{ project.title }}</h3>
-                    <div class="flex items-center mt-2 text-sm text-gray-500 font-medium">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        Posted {{ project.created_at|date:"M d, Y" }}
+                <div class="flex items-center space-x-4">
+                    {% if project.image %}
+                        <img src="{{ project.image.url }}" class="w-14 h-14 rounded-xl object-cover border-2 border-white shadow-sm">
+                    {% endif %}
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-900">{{ project.title }}</h3>
+                        <div class="flex space-x-3 mt-1">
+                            <span class="text-xs font-bold {% if project.status == 'active' %}text-mint{% else %}text-red-400{% endif %} uppercase">
+                                {{ project.status }}
+                            </span>
+                            <span class="text-xs text-gray-400 font-medium">Posted {{ project.created_at|date:"M d" }}</span>
+                        </div>
+                        <div class="mt-2 flex space-x-4">
+                             <a href="{% url 'projects:edit_project' project.id %}" class="text-xs font-bold text-ocean hover:underline">Edit Gig</a>
+                             <a href="{% url 'projects:delete_project' project.id %}" onclick="return confirm('Delete this gig?')" class="text-xs font-bold text-red-400 hover:underline">Delete</a>
+                        </div>
                     </div>
                 </div>
-                <div class="flex items-center space-x-6">
-                    <div class="text-right">
-                        <p class="text-2xl font-black text-gray-900">${{ project.budget }}</p>
-                        <span class="inline-flex items-center text-xs font-bold text-mint uppercase tracking-widest mt-1">
-                            <span class="w-2 h-2 bg-mint rounded-full mr-2 animate-pulse"></span>
-                            Active
-                        </span>
+
+                <!-- PROJECT CONTROLS (Top Right) -->
+                <div class="flex items-center space-x-4 bg-white p-3 rounded-2xl shadow-sm border border-gray-100">
+                    <div class="text-right mr-4 border-r pr-4 border-gray-100">
+                        <p class="text-xl font-black text-gray-900">${{ project.budget }}</p>
                     </div>
+                    <a href="{% url 'projects:toggle_project_status' project.id %}" class="text-xs font-bold text-gray-500 hover:text-ocean transition">
+                        {% if project.status == 'active' %}End Gig{% else %}Reactivate{% endif %}
+                    </a>
                 </div>
             </div>
 
             <!-- Proposals Section -->
             <div class="p-8">
-                <h4 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-6 flex items-center">
-                    Proposals Received 
-                    <span class="ml-3 px-2 py-0.5 bg-gray-100 text-gray-600 rounded-md">{{ project.applications.all.count }}</span>
+                <h4 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-6">
+                    Applicants ({{ project.applications.count }})
                 </h4>
                 
                 <div class="grid grid-cols-1 gap-4">
                     {% for app in project.applications.all %}
-                        <div class="flex flex-col md:flex-row items-start md:items-center justify-between p-6 bg-white border border-gray-100 rounded-2xl hover:border-ocean/30 transition-all hover:bg-blue-50/10">
-                            <div class="flex-grow">
-                                <div class="flex items-center space-x-3 mb-2">
-                                    <span class="w-8 h-8 rounded-full bg-mint/10 text-mint flex items-center justify-center font-bold text-sm">
-                                        {{ app.freelancer.username|first|upper }}
-                                    </span>
-                                    <span class="font-bold text-gray-800 text-lg">{{ app.freelancer.username }}</span>
-                                    <span class="text-sm font-bold text-mint bg-mint/5 px-3 py-1 rounded-full">
-                                        Bid: ${{ app.bid_amount }}
-                                    </span>
+                        <div class="p-6 bg-white border border-gray-100 rounded-2xl transition-all">
+                            <div class="flex flex-col md:flex-row items-start justify-between">
+                                <div class="flex-grow">
+                                    <!-- Freelancer Identity -->
+                                    <div class="flex items-center space-x-3 mb-4">
+                                        <div class="w-10 h-10 rounded-full bg-ocean/10 text-ocean flex items-center justify-center font-bold">
+                                            {{ app.freelancer.username|first|upper }}
+                                        </div>
+                                        <div>
+                                            <span class="font-bold text-gray-800">{{ app.freelancer.username }}</span>
+                                            <span class="ml-2 text-xs font-bold text-mint bg-mint/5 px-2 py-1 rounded-md">Bid: ${{ app.bid_amount }}</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- REQUIREMENTS COMPARISON -->
+                                    <div class="mb-6 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 bg-gray-50 p-4 rounded-xl border border-gray-100">
+                                        {% for req in project.requirements %}
+                                            <div class="flex items-center text-xs">
+                                                {% if req in app.met_requirements %}
+                                                    <span class="text-mint font-bold flex items-center">
+                                                        <svg class="w-3 h-3 mr-1.5" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
+                                                        {{ req }}
+                                                    </span>
+                                                {% else %}
+                                                    <span class="text-red-400 font-bold flex items-center opacity-60">
+                                                        <svg class="w-3 h-3 mr-1.5" fill="currentColor" viewBox="0 0 20 20"><path d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"/></svg>
+                                                        Missing: {{ req }}
+                                                    </span>
+                                                {% endif %}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+
+                                    <!-- READ MORE / PROFILE INFO -->
+                                    <details class="group">
+                                        <summary class="list-none cursor-pointer text-ocean text-xs font-bold uppercase tracking-wider flex items-center">
+                                            <span>Read Pitch & Profile</span>
+                                            <svg class="w-3 h-3 ml-1 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"></path></svg>
+                                        </summary>
+                                        <div class="mt-4 p-5 bg-gray-50 rounded-2xl border border-gray-100 text-sm text-gray-600 leading-relaxed">
+                                            <p class="mb-4 text-gray-900 font-medium italic">"{{ app.cover_letter }}"</p>
+                                            <div class="pt-4 border-t border-gray-200">
+                                                <p class="text-xs font-bold text-gray-400 uppercase mb-2">Freelancer Bio</p>
+                                                <p>{{ app.freelancer.bio|default:"No bio available." }}</p>
+                                            </div>
+                                        </div>
+                                    </details>
                                 </div>
-                                <p class="text-gray-600 italic leading-relaxed pl-11">
-                                    "{{ app.cover_letter|truncatewords:20 }}"
-                                </p>
-                            </div>
-                            <div class="mt-4 md:mt-0 md:ml-6 w-full md:w-auto">
-                                <a href="mailto:{{ app.freelancer.email }}" class="block text-center text-sm font-bold bg-white border-2 border-ocean text-ocean px-6 py-2.5 rounded-xl hover:bg-ocean hover:text-white transition-all">
-                                    Contact Freelancer
-                                </a>
+                                
+                                <!-- APPROVAL LOGIC -->
+                                <div class="mt-4 md:mt-0 md:ml-6 flex items-center space-x-3">
+                                    {% if app.status == 'pending' %}
+                                        <a href="{% url 'projects:vet_application' app.id 'approved' %}" class="bg-mint text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-md shadow-emerald-100 hover:scale-105 transition">Approve</a>
+                                        <a href="{% url 'projects:vet_application' app.id 'rejected' %}" class="text-gray-400 hover:text-red-500 font-bold text-sm px-4 transition">Decline</a>
+                                    {% elif app.status == 'approved' %}
+                                        <span class="text-xs font-black text-mint uppercase tracking-widest mr-4">Approved</span>
+                                        <a href="mailto:{{ app.freelancer.email }}" class="bg-ocean text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-md shadow-blue-100 hover:scale-105 transition">Contact</a>
+                                    {% else %}
+                                        <span class="text-xs font-black text-red-300 uppercase tracking-widest">Declined</span>
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
                     {% empty %}
-                        <div class="text-center py-8 bg-gray-50/50 rounded-2xl border border-dashed border-gray-200">
-                            <p class="text-gray-400 font-medium">Waiting for the perfect match...</p>
-                        </div>
+                        <p class="text-center py-10 text-gray-400 text-sm font-medium">No applications yet...</p>
                     {% endfor %}
                 </div>
             </div>
         </div>
     {% empty %}
         <div class="text-center py-32 bg-slate-50 rounded-[3rem] border-2 border-dashed border-gray-200">
-            <p class="text-xl text-gray-500 font-medium">You haven't posted any projects yet.</p>
-            <a href="{% url 'projects:create_project' %}" class="mt-4 inline-block text-ocean font-bold">Start by posting your first gig →</a>
+            <p class="text-xl text-gray-500 font-medium">No projects posted yet.</p>
         </div>
     {% endfor %}
 </div>

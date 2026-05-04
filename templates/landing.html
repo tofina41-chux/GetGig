@@ -8,9 +8,11 @@
         <div class="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-mint to-ocean opacity-20 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"></div>
     </div>
 
-    <div class="mx-auto max-w-7xl px-6 pb-24 pt-10 sm:pb-32 lg:flex lg:px-8 lg:py-40">
+    <!-- MAIN HERO SECTION (Merged) -->
+    <div class="mx-auto max-w-7xl px-6 pb-24 pt-10 sm:pb-32 lg:flex lg:items-center lg:gap-x-10 lg:px-8 lg:py-40">
+        
+        <!-- Left Side: Text Content -->
         <div class="mx-auto max-w-2xl flex-shrink-0 lg:mx-0 lg:max-w-xl lg:pt-8">
-            <!-- New Badge -->
             <div class="mt-24 sm:mt-32 lg:mt-16">
                 <a href="#" class="inline-flex space-x-6">
                     <span class="rounded-full bg-ocean/10 px-3 py-1 text-sm font-semibold leading-6 text-ocean ring-1 ring-inset ring-ocean/20">What's new</span>
@@ -20,12 +22,15 @@
                 </a>
             </div>
             
-            <h1 class="mt-10 text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
-                The future of <span class="text-transparent bg-clip-text bg-gradient-to-r from-ocean to-mint">Social Freelancing.</span>
+            <h1 class="mt-10 text-4xl font-black tracking-tight text-gray-900 sm:text-6xl">
+                <!-- If no config title exists, it shows a fallback -->
+                {{ config.hero_title|default:"The future of Social Freelancing." }}
             </h1>
+            
             <p class="mt-6 text-lg leading-8 text-gray-600">
-                GetGig connects elite talent with visionary clients. No bidding wars, just high-quality matches powered by a community that cares.
+                {{ config.hero_subtitle|default:"GetGig connects elite talent with visionary clients. No bidding wars, just high-quality matches." }}
             </p>
+
             <div class="mt-10 flex items-center gap-x-6">
                 <a href="{% url 'users:register' %}" class="rounded-2xl bg-ocean px-8 py-4 text-sm font-semibold text-white shadow-lg hover:bg-blue-700 transition-all transform hover:scale-105">
                     Start Earning
@@ -34,26 +39,44 @@
             </div>
         </div>
 
-        <!-- Hero Illustration/Image Placeholder -->
-        <div class="mx-auto mt-16 flex max-w-2xl sm:mt-24 lg:ml-10 lg:mr-0 lg:mt-0 lg:max-w-none lg:flex-none xl:ml-32">
-            <div class="max-w-3xl flex-none sm:max-w-5xl lg:max-w-none">
-                <div class="rounded-3xl bg-gray-900/5 p-2 ring-1 ring-inset ring-gray-900/10 lg:-m-4 lg:rounded-4xl lg:p-4">
-                    <!-- This is where a screenshot of your beautiful dashboard will go -->
-                    <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=2426&q=80" 
-     alt="GetGig Dashboard" 
-     class="w-[76rem] rounded-2xl shadow-2xl ring-1 ring-gray-900/10">
+        <!-- Right Side: Dynamic Image -->
+        <div class="mt-16 sm:mt-24 lg:mt-0 lg:flex-grow">
+            {% if config.hero_image %}
+                <img src="{{ config.hero_image.url }}" class="w-full max-w-[500px] mx-auto rounded-[3rem] shadow-2xl transform rotate-2 hover:rotate-0 transition-transform duration-500">
+            {% else %}
+                <!-- A sleek placeholder if you haven't uploaded an image yet -->
+                <div class="w-full max-w-[500px] h-96 mx-auto bg-gradient-to-br from-slate-50 to-slate-200 rounded-[3rem] border border-dashed border-gray-300 flex items-center justify-center text-gray-400 italic">
+                    Upload Hero Image in Admin
                 </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- The Live Stats Section (Centered) -->
+    <div class="mx-auto max-w-7xl px-6 lg:px-8">
+        <div class="grid grid-cols-3 gap-8 py-20 border-y border-gray-100 bg-white/50 backdrop-blur-sm rounded-[2rem]">
+            <div class="text-center">
+                <p class="text-4xl font-black text-ocean">{{ stats.total_gigs }}</p>
+                <p class="text-gray-400 font-bold uppercase tracking-widest text-xs mt-1">Active Gigs</p>
+            </div>
+            <div class="text-center border-x border-gray-100">
+                <p class="text-4xl font-black text-mint">{{ stats.total_freelancers }}</p>
+                <p class="text-gray-400 font-bold uppercase tracking-widest text-xs mt-1">Top Talent</p>
+            </div>
+            <div class="text-center">
+                <p class="text-4xl font-black text-gray-900">${{ stats.total_payouts }}</p>
+                <p class="text-gray-400 font-bold uppercase tracking-widest text-xs mt-1">Earned</p>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Simple Feature Section -->
-<div id="features" class="py-24 bg-slate-50">
-    <div class="mx-auto max-w-7xl px-6 lg:px-8">
-        <div class="mx-auto max-w-2xl text-center">
-            <h2 class="text-base font-semibold leading-7 text-mint">Deploy Faster</h2>
-            <p class="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Everything you need to scale your freelance business.</p>
+    <!-- Feature Section -->
+    <div id="features" class="py-24 bg-slate-50 mt-20">
+        <div class="mx-auto max-w-7xl px-6 lg:px-8">
+            <div class="mx-auto max-w-2xl text-center">
+                <h2 class="text-base font-semibold leading-7 text-mint uppercase tracking-widest">Deploy Faster</h2>
+                <p class="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Everything you need to scale your freelance business.</p>
+            </div>
         </div>
     </div>
 </div>

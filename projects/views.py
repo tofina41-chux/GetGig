@@ -1,55 +1,105 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .models import Project, Application
+from django.contrib import messages
+from django.contrib.auth import get_user_model
+
+# Import your models and forms
+from .models import Project, Application, SiteConfiguration
 from .forms import ProjectForm, ApplicationForm
-from users.models import Notification # Import your Notification model
-from django.contrib.admin.views.decorators import staff_member_required # If you want admin only
-# Or just use login_required if any client can vet their own projects
+from users.models import Notification 
+
+# This fixes the CustomUser Manager error
+User = get_user_model()
+
+# --- PUBLIC VIEWS ---
+
+def landing_page(request):
+    """The main entry point for the site."""
+    config = SiteConfiguration.objects.first() 
+    
+    stats = {
+        'total_gigs': Project.objects.filter(status='active').count(),
+        'total_freelancers': User.objects.filter(user_type='freelancer').count(), 
+        'total_payouts': "12.5k",
+    }
+    
+    return render(request, 'landing.html', {
+        'config': config,
+        'stats': stats
+    })
+
+# --- DASHBOARD VIEWS ---
 
 @login_required
 def client_dashboard(request):
     if request.user.user_type != 'client':
         return redirect('projects:freelancer_dashboard')
-    # Get all projects created by this client
     my_projects = Project.objects.filter(client=request.user).order_by('-created_at')
     return render(request, 'clients/dashboard.html', {'projects': my_projects})
 
 @login_required
 def freelancer_dashboard(request):
-    # 1. Security: If the user is actually a client, send them to their own dashboard
     if request.user.user_type == 'client':
         return redirect('projects:client_dashboard')
-    
-    # 2. Data: Get all projects created by ALL clients so the freelancer can browse them
-    all_projects = Project.objects.all().order_by('-created_at')
-    
-    # 3. Delivery: Send that list to the FREELANCER-specific template
+    all_projects = Project.objects.filter(status='active').order_by('-created_at')
     return render(request, 'freelancers/dashboard.html', {'projects': all_projects})
+
+# --- PROJECT MANAGEMENT ---
 
 @login_required
 def create_project(request):
     if request.method == 'POST':
-        form = ProjectForm(request.POST, request.FILES) # Don't forget to handle file uploads
+        form = ProjectForm(request.POST, request.FILES)
         if form.is_valid():
             project = form.save(commit=False)
             project.client = request.user
+            raw_reqs = form.cleaned_data.get('requirements', '')
+            project.requirements = [r.strip() for r in raw_reqs.split(',') if r.strip()]
             project.save()
+            messages.success(request, "Project posted!")
             return redirect('projects:client_dashboard')
     else:
         form = ProjectForm()
     return render(request, 'clients/create_project.html', {'form': form})
 
 @login_required
+def edit_project(request, project_id):
+    project = get_object_or_404(Project, id=project_id, client=request.user)
+    if request.method == 'POST':
+        form = ProjectForm(request.POST, request.FILES, instance=project)
+        if form.is_valid():
+            raw_reqs = form.cleaned_data.get('requirements', '')
+            project.requirements = [r.strip() for r in raw_reqs.split(',') if r.strip()]
+            form.save()
+            return redirect('projects:client_dashboard')
+    else:
+        initial_reqs = ", ".join(project.requirements)
+        form = ProjectForm(instance=project, initial={'requirements': initial_reqs})
+    return render(request, 'clients/create_project.html', {'form': form, 'editing': True})
+
+@login_required
+def delete_project(request, project_id):
+    project = get_object_or_404(Project, id=project_id, client=request.user)
+    project.delete()
+    return redirect('projects:client_dashboard')
+
+@login_required
+def toggle_project_status(request, project_id):
+    project = get_object_or_404(Project, id=project_id, client=request.user)
+    project.status = 'ended' if project.status == 'active' else 'active'
+    project.save()
+    return redirect('projects:client_dashboard')
+
+# --- APPLICATION & VETTING ---
+
+@login_required
 def apply_to_project(request, project_id):
     project = get_object_or_404(Project, id=project_id)
-    
-    # Security: Don't let clients apply to jobs
     if request.user.user_type != 'freelancer':
         return redirect('projects:client_dashboard')
 
-    # Optional: Check if already applied
     if Application.objects.filter(project=project, freelancer=request.user).exists():
-        # Optional: messages.info(request, "You have already applied for this gig.")
+        messages.info(request, "Already applied.")
         return redirect('projects:freelancer_dashboard')
 
     if request.method == 'POST':
@@ -58,68 +108,45 @@ def apply_to_project(request, project_id):
             application = form.save(commit=False)
             application.project = project
             application.freelancer = request.user
+            application.met_requirements = request.POST.getlist('met_requirements')
             application.save()
-
-            # --- NEW NOTIFICATION LOGIC ---
-            # Notify the client (the person who posted the project)
             Notification.objects.create(
-                user=project.client, # The client
-                message=f"New application from {request.user.username} for your project: '{project.title}'."
+                user=project.client,
+                message=f"New application for '{project.title}'."
             )
-            # ------------------------------
-
             return redirect('projects:freelancer_dashboard')
     else:
         form = ApplicationForm()
-    
     return render(request, 'freelancers/apply.html', {'form': form, 'project': project})
 
-
 @login_required
-def update_application_status(request, app_id, status):
-    # Ensure only the client who owns the project can update the status
-    application = get_object_or_404(Application, id=app_id, project__client=request.user)
+def vet_application(request, application_id=None, app_id=None, status=None):
+    """
+    Handles both URL variants: 'vet_application' and 'update_application_status'
+    """
+    # Use whichever ID the URL provided
+    target_id = application_id or app_id
+    application = get_object_or_404(Application, id=target_id)
     
-    if status in ['accepted', 'rejected']:
+    if application.project.client != request.user:
+        messages.error(request, "Unauthorized.")
+        return redirect('projects:client_dashboard')
+
+    if status in ['accepted', 'rejected', 'approved']:
         application.status = status
         application.save()
-        
-        if status == 'accepted':
-            messages.success(request, f"Proposal from {application.freelancer.username} accepted!")
-        else:
-            messages.warning(request, f"Proposal from {application.freelancer.username} rejected.")
-            
+        Notification.objects.create(
+            user=application.freelancer,
+            message=f"Application for '{application.project.title}' was {status}."
+        )
+        messages.success(request, f"Application {status}!")
+    
     return redirect('projects:client_dashboard')
 
+# ALIAS: This makes sure the 'update_application_status' name exists for urls.py
+update_application_status = vet_application
 
 @login_required
 def freelancer_bids(request):
-    if request.user.user_type != 'freelancer':
-        return redirect('projects:client_dashboard')
-    
     bids = Application.objects.filter(freelancer=request.user).select_related('project')
     return render(request, 'freelancers/my_bids.html', {'bids': bids})
-
-
-@login_required
-def vet_application(request, application_id, status):
-    application = get_object_or_404(Application, id=application_id)
-    
-    # Security: Only the project owner can vet applications
-    # (Update '.client' below to match your Project model attribute)
-    if application.project.client != request.user:
-        messages.error(request, "You are not authorized to vet this application.")
-        return redirect('projects:client_dashboard')
-
-    if status in ['approved', 'rejected']:
-        application.status = status
-        application.save()
-        
-        # Notify the Freelancer
-        Notification.objects.create(
-            user=application.freelancer,
-            message=f"Update: Your application for '{application.project.title}' has been {status}."
-        )
-        messages.success(request, f"Application {status} successfully.")
-    
-    return redirect('projects:client_dashboard')
