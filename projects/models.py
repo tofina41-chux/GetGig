@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
 
 class Project(models.Model):
     client = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='projects')
@@ -15,6 +16,28 @@ class Project(models.Model):
         choices=[('active', 'Active'), ('ended', 'Ended')], 
         default='active'
     )
+
+    @property
+    def is_ended(self):
+        return self.status == 'ended' or self.deadline < timezone.localdate()
+
+    @property
+    def days_until_deadline(self):
+        return (self.deadline - timezone.localdate()).days
+
+    @property
+    def status_label(self):
+        if self.is_ended:
+            return 'Ended'
+        if self.deadline == timezone.localdate():
+            return 'Happening Today'
+        if self.days_until_deadline == 1:
+            return 'Due tomorrow'
+        return f"Due in {self.days_until_deadline} days"
+
+    @property
+    def can_apply(self):
+        return self.status == 'active' and self.deadline >= timezone.localdate()
 
     def __str__(self):
         return self.title
@@ -41,8 +64,13 @@ class Application(models.Model):
 
 class SiteConfiguration(models.Model):
     site_name = models.CharField(max_length=100, default="GetGig")
-    hero_title = models.CharField(max_length=255, default="Find the perfect talent for your next big idea.")
-    hero_subtitle = models.TextField(default="A premium marketplace for high-end freelancers.")
+    hero_title = models.CharField(
+        max_length=255,
+        default="A better way to hire and work with elite freelance talent."
+    )
+    hero_subtitle = models.TextField(
+        default="Post premium gigs, match with qualified freelancers, and manage proposals all in one social freelancing marketplace."
+    )
     hero_image = models.ImageField(upload_to='site_assets/', blank=True, null=True)
 
     class Meta:

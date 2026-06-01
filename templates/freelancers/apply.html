@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="max-w-2xl mx-auto">
-    <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
-        <h2 class="text-2xl font-bold text-gray-800 mb-2">Apply for {{ project.title }}</h2>
+    <div class="bg-white dark:bg-slate-900 p-8 rounded-xl shadow-lg border border-gray-100 dark:border-slate-700">
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-slate-100 mb-2">Apply for {{ project.title }}</h2>
         <p class="text-ocean font-semibold mb-6">Budget: ${{ project.budget }}</p>
 
         <form method="post" class="space-y-4">
             {% csrf_token %}
-            <div class="bg-slate-50 p-6 rounded-2xl mb-8 border border-gray-100">
-    <h3 class="text-sm font-black text-gray-400 uppercase tracking-widest mb-4">Confirm Requirements</h3>
+            <div class="bg-slate-50 dark:bg-slate-900 p-6 rounded-2xl mb-8 border border-gray-100 dark:border-slate-700">
+    <h3 class="text-sm font-black text-gray-400 dark:text-slate-400 uppercase tracking-widest mb-4">Confirm Requirements</h3>
     {% for req in project.requirements %}
     <div class="flex items-center mb-3">
         <input type="checkbox" name="met_requirements" value="{{ req }}" class="w-5 h-5 rounded border-gray-300 text-ocean focus:ring-ocean mr-3">
@@ -17,19 +17,19 @@
     {% endfor %}
 </div>
             <div>
-                <label class="block text-gray-700 font-medium mb-2">Your Pitch / Cover Letter</label>
-                <textarea name="cover_letter" rows="5" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-mint outline-none" placeholder="Why are you the best fit for this gig?"></textarea>
+                <label class="block text-gray-700 dark:text-slate-200 font-medium mb-2">Your Pitch / Cover Letter</label>
+                <textarea name="cover_letter" rows="5" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-mint outline-none bg-white dark:bg-slate-800 dark:text-slate-100" placeholder="Why are you the best fit for this gig?"></textarea>
             </div>
             <div>
-                <label class="block text-gray-700 font-medium mb-2">Bid Amount ($)</label>
-                <input type="number" name="bid_amount" value="{{ project.budget }}" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-mint outline-none">
+                <label class="block text-gray-700 dark:text-slate-200 font-medium mb-2">Bid Amount ($)</label>
+                <input type="number" name="bid_amount" value="{{ project.budget }}" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-mint outline-none bg-white dark:bg-slate-800 dark:text-slate-100">
             </div>
             
             <div class="flex space-x-4 pt-4">
                 <button type="submit" class="flex-1 bg-[#14A38B] text-white py-3 rounded-lg font-bold hover:bg-teal-600 transition">
                     Submit Proposal
                 </button>
-                <a href="{% url 'projects:freelancer_dashboard' %}" class="flex-1 text-center py-3 text-gray-500 hover:text-gray-800 font-semibold">
+                <a href="{% url 'projects:freelancer_dashboard' %}" class="flex-1 text-center py-3 text-gray-500 dark:text-slate-300 hover:text-gray-800 dark:hover:text-slate-100 font-semibold">
                     Back to Board
                 </a>
             </div>

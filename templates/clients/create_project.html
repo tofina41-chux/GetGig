@@ -9,12 +9,12 @@
         <p class="text-gray-500 mt-2">Set your requirements and find the perfect talent.</p>
     </div>
 
-    <form method="POST" enctype="multipart/form-data" class="bg-white p-10 rounded-[2.5rem] shadow-xl shadow-blue-50 border border-gray-100 space-y-6">
+    <form method="POST" enctype="multipart/form-data" class="bg-white dark:bg-slate-900 p-10 rounded-[2.5rem] shadow-xl shadow-blue-50 border border-gray-100 dark:border-slate-700 space-y-6">
         {% csrf_token %}
         
         {% for field in form %}
             <div class="space-y-2">
-                <label class="text-sm font-black text-gray-400 uppercase tracking-widest px-1">
+                <label class="text-sm font-black text-gray-400 dark:text-slate-400 uppercase tracking-widest px-1">
                     {{ field.label }}
                 </label>
                 {{ field }}
@@ -31,7 +31,7 @@
             <button type="submit" class="w-full bg-ocean text-white py-5 rounded-2xl font-bold text-lg hover:bg-blue-700 transition-all transform hover:scale-[1.02] shadow-lg shadow-blue-100">
                 {% if editing %}Update Project{% else %}Launch Project{% endif %}
             </button>
-            <a href="{% url 'projects:client_dashboard' %}" class="block text-center mt-4 text-gray-400 font-bold hover:text-gray-600 transition">
+            <a href="{% url 'projects:client_dashboard' %}" class="block text-center mt-4 text-gray-400 dark:text-slate-400 font-bold hover:text-gray-600 dark:hover:text-slate-200 transition">
                 Cancel
             </a>
         </div>

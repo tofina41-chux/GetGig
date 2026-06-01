@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block content %}
-<div class="relative isolate overflow-hidden bg-white">
+<div class="relative isolate overflow-hidden bg-white dark:bg-slate-950">
     <!-- Soft Gradient Background -->
     <div class="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80">
         <div class="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-mint to-ocean opacity-20 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"></div>
@@ -16,7 +16,7 @@
             <div class="mt-24 sm:mt-32 lg:mt-16">
                 <a href="#" class="inline-flex space-x-6">
                     <span class="rounded-full bg-ocean/10 px-3 py-1 text-sm font-semibold leading-6 text-ocean ring-1 ring-inset ring-ocean/20">What's new</span>
-                    <span class="inline-flex items-center space-x-2 text-sm font-medium leading-6 text-gray-600">
+                    <span class="inline-flex items-center space-x-2 text-sm font-medium leading-6 text-gray-600 dark:text-slate-300">
                         <span>Just won 1st Place!</span>
                     </span>
                 </a>
@@ -27,26 +27,54 @@
                 {{ config.hero_title|default:"The future of Social Freelancing." }}
             </h1>
             
-            <p class="mt-6 text-lg leading-8 text-gray-600">
+            <p class="mt-6 text-lg leading-8 text-gray-600 dark:text-slate-300">
                 {{ config.hero_subtitle|default:"GetGig connects elite talent with visionary clients. No bidding wars, just high-quality matches." }}
             </p>
 
-            <div class="mt-10 flex items-center gap-x-6">
-                <a href="{% url 'users:register' %}" class="rounded-2xl bg-ocean px-8 py-4 text-sm font-semibold text-white shadow-lg hover:bg-blue-700 transition-all transform hover:scale-105">
-                    Start Earning
+            <div class="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
+                <a href="{% url 'users:register' %}" class="inline-flex items-center justify-center rounded-2xl bg-ocean px-8 py-4 text-sm font-semibold text-white shadow-lg hover:bg-blue-700 transition-all transform hover:scale-105">
+                    Create client account
                 </a>
-                <a href="#features" class="text-sm font-semibold leading-6 text-gray-900">Learn more <span aria-hidden="true">→</span></a>
+                <a href="{% url 'users:register' %}" class="inline-flex items-center justify-center rounded-2xl border border-gray-200 bg-white px-8 py-4 text-sm font-semibold text-gray-900 shadow-sm hover:border-ocean hover:text-ocean transition-all dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800">
+                    Create freelancer account
+                </a>
+            </div>
+            <p class="mt-4 text-sm text-gray-500 dark:text-slate-400">Choose your role when signing up, then start posting gigs or applying immediately.</p>
+            <div class="mt-10 grid gap-4 sm:grid-cols-2">
+                <div class="rounded-[2rem] border border-gray-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                    <h3 class="text-sm font-semibold uppercase tracking-[0.2em] text-gray-500 dark:text-slate-400">For clients</h3>
+                    <p class="mt-4 text-gray-600 text-sm leading-relaxed dark:text-slate-300">Launch a project with clear requirements, receive curated proposals, and hire top freelancers without bidding noise.</p>
+                </div>
+                <div class="rounded-[2rem] border border-gray-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                    <h3 class="text-sm font-semibold uppercase tracking-[0.2em] text-gray-500 dark:text-slate-400">For freelancers</h3>
+                    <p class="mt-4 text-gray-600 text-sm leading-relaxed dark:text-slate-300">Browse vetted gigs, match your skills to real client needs, and submit proposals that stand out.</p>
+                </div>
             </div>
         </div>
 
         <!-- Right Side: Dynamic Image -->
         <div class="mt-16 sm:mt-24 lg:mt-0 lg:flex-grow">
             {% if config.hero_image %}
-                <img src="{{ config.hero_image.url }}" class="w-full max-w-[500px] mx-auto rounded-[3rem] shadow-2xl transform rotate-2 hover:rotate-0 transition-transform duration-500">
+                <img src="{{ config.hero_image.url }}" alt="GetGig platform preview" class="w-full max-w-[500px] mx-auto rounded-[3rem] shadow-2xl transform rotate-2 hover:rotate-0 transition-transform duration-500">
             {% else %}
-                <!-- A sleek placeholder if you haven't uploaded an image yet -->
-                <div class="w-full max-w-[500px] h-96 mx-auto bg-gradient-to-br from-slate-50 to-slate-200 rounded-[3rem] border border-dashed border-gray-300 flex items-center justify-center text-gray-400 italic">
-                    Upload Hero Image in Admin
+                <div class="w-full max-w-[500px] mx-auto rounded-[3rem] border border-gray-200 bg-gradient-to-br from-[#e2f5f4] to-[#eef6ff] p-10 shadow-2xl dark:border-slate-700 dark:from-slate-800 dark:to-slate-900">
+                    <div class="flex h-full flex-col justify-between rounded-[2.5rem] bg-white p-8 shadow-lg dark:bg-slate-900">
+                        <div>
+                            <div class="inline-flex items-center rounded-full bg-ocean/10 px-3 py-1 text-sm font-semibold text-ocean">GetGig Preview</div>
+                            <h2 class="mt-8 text-3xl font-bold text-gray-900 dark:text-slate-100">Launch your first premium gig</h2>
+                            <p class="mt-4 text-gray-600 dark:text-slate-300">Use the Django admin to update hero imagery, copy, and landing page details without changing code.</p>
+                        </div>
+                        <div class="mt-8 space-y-4">
+                            <div class="rounded-3xl bg-slate-50 p-5 dark:bg-slate-900">
+                                <p class="text-sm font-semibold text-gray-800 dark:text-slate-100">Clear requirements</p>
+                                <p class="text-sm text-gray-500 dark:text-slate-400">Tell freelancers exactly what you need.</p>
+                            </div>
+                            <div class="rounded-3xl bg-slate-50 p-5 dark:bg-slate-900">
+                                <p class="text-sm font-semibold text-gray-800 dark:text-slate-100">Faster hiring</p>
+                                <p class="text-sm text-gray-500 dark:text-slate-400">Review proposals in one streamlined dashboard.</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             {% endif %}
         </div>
@@ -54,7 +82,7 @@
 
     <!-- The Live Stats Section (Centered) -->
     <div class="mx-auto max-w-7xl px-6 lg:px-8">
-        <div class="grid grid-cols-3 gap-8 py-20 border-y border-gray-100 bg-white/50 backdrop-blur-sm rounded-[2rem]">
+        <div class="grid grid-cols-3 gap-8 py-20 border-y border-gray-100 bg-white/50 backdrop-blur-sm rounded-[2rem] dark:border-slate-700 dark:bg-slate-900/70">
             <div class="text-center">
                 <p class="text-4xl font-black text-ocean">{{ stats.total_gigs }}</p>
                 <p class="text-gray-400 font-bold uppercase tracking-widest text-xs mt-1">Active Gigs</p>
@@ -70,12 +98,119 @@
         </div>
     </div>
 
-    <!-- Feature Section -->
-    <div id="features" class="py-24 bg-slate-50 mt-20">
+    <!-- How It Works Section -->
+    <div id="how-it-works" class="py-24 bg-slate-50 mt-20 dark:bg-slate-950">
         <div class="mx-auto max-w-7xl px-6 lg:px-8">
             <div class="mx-auto max-w-2xl text-center">
-                <h2 class="text-base font-semibold leading-7 text-mint uppercase tracking-widest">Deploy Faster</h2>
-                <p class="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Everything you need to scale your freelance business.</p>
+                <h2 class="text-base font-semibold leading-7 text-mint uppercase tracking-widest">How it works</h2>
+                <p class="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">A fast, simple workflow for clients and freelancers.</p>
+            </div>
+
+            <div class="mt-16 grid gap-8 lg:grid-cols-3">
+                <div class="rounded-[2rem] border border-gray-200 bg-white p-8 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                    <span class="inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-ocean/10 text-ocean font-black">1</span>
+                    <h3 class="mt-6 text-xl font-bold text-gray-900 dark:text-slate-100">Post a gig</h3>
+                    <p class="mt-4 text-gray-600 dark:text-slate-300">Clients add project details, deadlines, and requirements so freelancers see exactly what is needed.</p>
+                </div>
+                <div class="rounded-[2rem] border border-gray-200 bg-white p-8 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                    <span class="inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-ocean/10 text-ocean font-black">2</span>
+                    <h3 class="mt-6 text-xl font-bold text-gray-900 dark:text-slate-100">Browse and apply</h3>
+                    <p class="mt-4 text-gray-600 dark:text-slate-300">Freelancers find active gigs, confirm matching requirements, and send a tailored proposal.</p>
+                </div>
+                <div class="rounded-[2rem] border border-gray-200 bg-white p-8 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                    <span class="inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-ocean/10 text-ocean font-black">3</span>
+                    <h3 class="mt-6 text-xl font-bold text-gray-900 dark:text-slate-100">Hire with confidence</h3>
+                    <p class="mt-4 text-gray-600 dark:text-slate-300">Clients review applications, select the best freelancer, and close the gig once the work is filled.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Benefits Section -->
+    <div id="benefits" class="py-24 bg-slate-50 mt-20 dark:bg-slate-950">
+        <div class="mx-auto max-w-7xl px-6 lg:px-8">
+            <div class="mx-auto max-w-2xl text-center">
+                <h2 class="text-base font-semibold leading-7 text-mint uppercase tracking-widest">Why GetGig</h2>
+                <p class="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Built for quality freelance matches and clearer hiring decisions.</p>
+            </div>
+
+            <div class="mt-16 grid gap-8 lg:grid-cols-4">
+                <div class="rounded-[2rem] border border-gray-200 bg-white p-8 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-slate-100">No bidding wars</h3>
+                    <p class="mt-4 text-gray-600 dark:text-slate-300">Clients get clean proposals from freelancers who already meet the listed requirements.</p>
+                </div>
+                <div class="rounded-[2rem] border border-gray-200 bg-white p-8 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-slate-100">Transparent deadlines</h3>
+                    <p class="mt-4 text-gray-600 dark:text-slate-300">Deadlines and status are visible upfront so freelancers can apply only to gigs they can deliver on time.</p>
+                </div>
+                <div class="rounded-[2rem] border border-gray-200 bg-white p-8 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-slate-100">Streamlined applications</h3>
+                    <p class="mt-4 text-gray-600 dark:text-slate-300">Freelancers submit one proposal per gig, and clients can quickly review every application in one dashboard.</p>
+                </div>
+                <div class="rounded-[2rem] border border-gray-200 bg-white p-8 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-slate-100">Easy client control</h3>
+                    <p class="mt-4 text-gray-600 dark:text-slate-300">Clients can end gigs when the work is filled, keeping the platform fresh and focused on active opportunities.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trust Signals Section -->
+    <div id="trust" class="py-20 bg-white dark:bg-slate-950">
+        <div class="mx-auto max-w-7xl px-6 lg:px-8">
+            <div class="rounded-[2rem] border border-gray-200 bg-slate-50 p-10 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                <div class="grid gap-8 lg:grid-cols-3">
+                    <div>
+                        <span class="inline-flex items-center rounded-full bg-ocean/10 px-4 py-2 text-sm font-semibold text-ocean">Trusted by clients</span>
+                        <h3 class="mt-6 text-2xl font-bold text-gray-900 dark:text-slate-100">Quality project intake</h3>
+                        <p class="mt-4 text-gray-600 dark:text-slate-300">Every gig is posted with crystal clear requirements, so freelancers know exactly what clients need.</p>
+                    </div>
+                    <div>
+                        <span class="inline-flex items-center rounded-full bg-mint/10 px-4 py-2 text-sm font-semibold text-mint">Review faster</span>
+                        <h3 class="mt-6 text-2xl font-bold text-gray-900 dark:text-slate-100">Simplified proposal management</h3>
+                        <p class="mt-4 text-gray-600 dark:text-slate-300">Clients and freelancers both benefit from a clean workflow that makes matching fast and intuitive.</p>
+                    </div>
+                    <div>
+                        <span class="inline-flex items-center rounded-full bg-blue-100 px-4 py-2 text-sm font-semibold text-blue-600">Admin powered</span>
+                        <h3 class="mt-6 text-2xl font-bold text-gray-900 dark:text-slate-100">Update hero content from Django admin</h3>
+                        <p class="mt-4 text-gray-600 dark:text-slate-300">Use the Django admin to manage landing page copy, hero imagery, and site configuration without redeploying.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-16 rounded-[2rem] border border-gray-200 bg-ocean/5 p-10 text-center dark:border-slate-700 dark:bg-slate-900/80">
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-slate-100">Ready to get started?</h2>
+                <p class="mt-4 text-gray-600 dark:text-slate-300">Sign up as a client or freelancer and start managing gigs in minutes.</p>
+                <div class="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-6">
+                    <a href="{% url 'users:register' %}" class="inline-flex items-center justify-center rounded-2xl bg-ocean px-8 py-4 text-sm font-semibold text-white shadow-lg hover:bg-blue-700 transition-all">
+                        Join GetGig
+                    </a>
+                    <a href="{% url 'login' %}" class="inline-flex items-center justify-center rounded-2xl border border-gray-200 bg-white px-8 py-4 text-sm font-semibold text-gray-900 hover:border-ocean hover:text-ocean transition-all dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800">
+                        Login instead
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="faq" class="py-24 bg-slate-50 dark:bg-slate-950">
+        <div class="mx-auto max-w-7xl px-6 lg:px-8">
+            <div class="mx-auto max-w-3xl text-center">
+                <h2 class="text-base font-semibold leading-7 text-mint uppercase tracking-widest">FAQ</h2>
+                <p class="mt-2 text-3xl font-bold tracking-tight text-gray-900 dark:text-slate-100 sm:text-4xl">Why GetGig?</p>
+            </div>
+            <div class="mt-16 grid gap-8 lg:grid-cols-3">
+                <div class="rounded-[2rem] border border-gray-200 bg-white p-8 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-slate-100">How do clients post a gig?</h3>
+                    <p class="mt-4 text-gray-600 dark:text-slate-300">Clients create a project with title, description, budget, deadline, and requirements. Freelancers then apply only to active gigs that match their skills.</p>
+                </div>
+                <div class="rounded-[2rem] border border-gray-200 bg-white p-8 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-slate-100">How do freelancers apply?</h3>
+                    <p class="mt-4 text-gray-600 dark:text-slate-300">Freelancers browse open gigs, confirm they meet the requirements, and submit a tailored proposal through the application form.</p>
+                </div>
+                <div class="rounded-[2rem] border border-gray-200 bg-white p-8 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-slate-100">Why GetGig?</h3>
+                    <p class="mt-4 text-gray-600 dark:text-slate-300">GetGig makes hiring simpler by removing bidding noise, surfacing deadline status, and focusing on quality proposals.</p>
+                </div>
             </div>
         </div>
     </div>

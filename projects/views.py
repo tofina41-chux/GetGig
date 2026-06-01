@@ -41,7 +41,7 @@ def client_dashboard(request):
 def freelancer_dashboard(request):
     if request.user.user_type == 'client':
         return redirect('projects:client_dashboard')
-    all_projects = Project.objects.filter(status='active').order_by('-created_at')
+    all_projects = Project.objects.order_by('-created_at')
     return render(request, 'freelancers/dashboard.html', {'projects': all_projects})
 
 # --- PROJECT MANAGEMENT ---
@@ -100,6 +100,10 @@ def apply_to_project(request, project_id):
 
     if Application.objects.filter(project=project, freelancer=request.user).exists():
         messages.info(request, "Already applied.")
+        return redirect('projects:freelancer_dashboard')
+
+    if not project.can_apply:
+        messages.error(request, "This gig is no longer accepting applications.")
         return redirect('projects:freelancer_dashboard')
 
     if request.method == 'POST':
