@@ -35,13 +35,14 @@ ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '127.0.0.1,localhost,.ver
 # ==============================================================================
 
 INSTALLED_APPS = [
+    
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'cloudinary_storage',  # Primary storage handler component
+    'cloudinary_storage',
     'cloudinary',
     'users',
     'projects',
@@ -100,22 +101,24 @@ if os.environ.get('DATABASE_URL'):
 
 
 # ==============================================================================
-# STATIC & MEDIA FILES CONFIGURATION (WhiteNoise & Cloudinary Forced)
+# STATIC & MEDIA FILES CONFIGURATION (Django 6 Clean Split)
 # ==============================================================================
 
 STATIC_URL = '/static/'
-
-# Where collectstatic dumps files. Vercel routes expect assets to live in 'static'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-# Enables WhiteNoise compression and caching for production environments
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-# Media assets routing configuration
 MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# Force explicit usage of Cloudinary for ALL uploaded media files
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+# Isolated storage backend delegation engines
+STORAGES = {
+    "default": {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+    },
+}
 
 CLOUDINARY_STORAGE = {
     'CLOUDINARY_URL': 'cloudinary://813553949787683:6ACOViZygV8ewifaBo4_LMbjC8s@djmjge5xu'
