@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
+from cloudinary.models import CloudinaryField  # Imported native cloud field pipeline
 
 class Project(models.Model):
     client = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='projects')
@@ -9,7 +10,10 @@ class Project(models.Model):
     budget = models.DecimalField(max_digits=10, decimal_places=2)
     deadline = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
-    image = models.ImageField(upload_to='project_images/', blank=True, null=True)
+    
+    # Swapped to CloudinaryField to bypass Vercel read-only disk error
+    image = CloudinaryField('image', folder='project_images', blank=True, null=True)
+    
     requirements = models.JSONField(default=list, blank=True) # Stores ['Above 18', 'Fluent Spanish']
     status = models.CharField(
         max_length=20, 
@@ -61,7 +65,6 @@ class Application(models.Model):
         return f"{self.freelancer.username} - {self.project.title}"
 
 
-
 class SiteConfiguration(models.Model):
     site_name = models.CharField(max_length=100, default="GetGig")
     hero_title = models.CharField(
@@ -71,7 +74,9 @@ class SiteConfiguration(models.Model):
     hero_subtitle = models.TextField(
         default="Post premium gigs, match with qualified freelancers, and manage proposals all in one social freelancing marketplace."
     )
-    hero_image = models.ImageField(upload_to='site_assets/', blank=True, null=True)
+    
+    # Swapped to CloudinaryField to clear your admin area save crashes
+    hero_image = CloudinaryField('image', folder='site_assets', blank=True, null=True)
 
     class Meta:
         verbose_name = "Site Configuration"

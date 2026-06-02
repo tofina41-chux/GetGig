@@ -35,24 +35,23 @@ ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '127.0.0.1,localhost,.ver
 # ==============================================================================
 
 INSTALLED_APPS = [
-    
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'cloudinary_storage',
-    'cloudinary',
+    'django.contrib.staticfiles', # WhiteNoise reads directly from this now
+    'cloudinary',                 # Official SDK backend
     'users',
     'projects',
     'storages',
     'pwa',
 ]
 
+# MIDDLEWARE check - Ensure WhiteNoise is directly below SecurityMiddleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # Must stay directly under SecurityMiddleware
+    'whitenoise.middleware.WhiteNoiseMiddleware', # Must be here
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -110,19 +109,24 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# Isolated storage backend delegation engines
+# Force WhiteNoise to deliver your styles cleanly
 STORAGES = {
     "default": {
-        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
     },
 }
 
-CLOUDINARY_STORAGE = {
-    'CLOUDINARY_URL': 'cloudinary://813553949787683:6ACOViZygV8ewifaBo4_LMbjC8s@djmjge5xu'
-}
+# Native Cloudinary Credentials mapping
+import cloudinary
+cloudinary.config(
+  cloud_name = "djmjge5xu",
+  api_key = "813553949787683",
+  api_secret = "6ACOViZygV8ewifaBo4_LMbjC8s",
+  secure = True
+)
 
 # ==============================================================================
 # AUTHENTICATION & CORE POLICIES
