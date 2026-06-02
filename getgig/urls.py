@@ -9,11 +9,11 @@ urlpatterns = [
     path('users/', include('users.urls')),
     path('projects/', include('projects.urls')),
     
+    # Progressive Web App Configuration URLs (Must stay above empty root home URLs)
+    path('', include('pwa.urls')),
+    
     # Core Landing Page Mapping
     path('', project_views.landing_page, name='home'),
-    
-    # Progressive Web App Configuration URLs
-    path('', include('pwa.urls')),
     
     # Standard authentication views helper
     path('accounts/', include('django.contrib.auth.urls')), 
@@ -22,6 +22,4 @@ urlpatterns = [
 # Media handling fallback rules
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-else:
-    # Ensure Vercel can serve legacy local assets if Cloudinary is bypassed
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
