@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'cloudinary',
     'users',
     'projects',
     'storages',
@@ -109,8 +110,18 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # Enables WhiteNoise compression and caching for production environments
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# Media files - use Cloudinary in production, local filesystem in development
+if os.environ.get('CLOUDINARY_URL'):
+    # Production: Use Cloudinary for media uploads
+    MEDIA_URL = '/media/'
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    
+    import cloudinary
+    cloudinary.config(secure=True)
+else:
+    # Development: Use local filesystem
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 # ==============================================================================
