@@ -2,11 +2,6 @@
   "version": 2,
   "builds": [
     {
-      "src": "build_files.sh",
-      "use": "@vercel/static-build",
-      "config": { "distDir": "static" }
-    },
-    {
       "src": "getgig/wsgi.py",
       "use": "@vercel/python",
       "config": {
@@ -19,10 +14,6 @@
     {
       "src": "/static/(.*)",
       "dest": "static/$1"
-    },
-    {
-      "src": "/media/(.*)",
-      "dest": "media/$1"
     },
     {
       "src": "(.*)",
