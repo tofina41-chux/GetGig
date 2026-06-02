@@ -8,6 +8,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('users/', include('users.urls')),
     path('projects/', include('projects.urls')),
+    path('', include('pwa.urls')),
     path('', project_views.landing_page, name='home'),
     # This adds the login/logout views automatically
     path('accounts/', include('django.contrib.auth.urls')), 
