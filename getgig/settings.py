@@ -100,7 +100,7 @@ if os.environ.get('DATABASE_URL'):
 
 
 # ==============================================================================
-# STATIC & MEDIA FILES CONFIGURATION (WhiteNoise & Cloudinary Managed)
+# STATIC & MEDIA FILES CONFIGURATION (WhiteNoise & Cloudinary Forced)
 # ==============================================================================
 
 STATIC_URL = '/static/'
@@ -111,24 +111,15 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # Enables WhiteNoise compression and caching for production environments
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Media assets fallback engine mapping configurations
+# Media assets routing configuration
 MEDIA_URL = '/media/'
 
-# Apply provided production credentials fallback string directly
+# Force explicit usage of Cloudinary for ALL uploaded media files
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
 CLOUDINARY_STORAGE = {
-    'CLOUDINARY_URL': os.environ.get(
-        'CLOUDINARY_URL', 
-        'cloudinary://813553949787683:6ACOViZygV8ewifaBo4_LMbjC8s@djmjge5xu'
-    )
+    'CLOUDINARY_URL': 'cloudinary://813553949787683:6ACOViZygV8ewifaBo4_LMbjC8s@djmjge5xu'
 }
-
-# Auto-detect Cloudinary state hook execution loop
-if os.environ.get('CLOUDINARY_URL') or CLOUDINARY_STORAGE['CLOUDINARY_URL']:
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-else:
-    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
 
 # ==============================================================================
 # AUTHENTICATION & CORE POLICIES
