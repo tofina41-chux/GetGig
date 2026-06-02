@@ -111,16 +111,20 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Media files - use Cloudinary in production, local filesystem in development
+MEDIA_URL = '/media/'
+
 if os.environ.get('CLOUDINARY_URL'):
     # Production: Use Cloudinary for media uploads
-    MEDIA_URL = '/media/'
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
     
-    import cloudinary
-    cloudinary.config(secure=True)
+    try:
+        import cloudinary
+        cloudinary.config(secure=True)
+    except Exception as e:
+        print(f"Warning: Cloudinary config failed: {e}")
+        MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 else:
     # Development: Use local filesystem
-    MEDIA_URL = '/media/'
     MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
