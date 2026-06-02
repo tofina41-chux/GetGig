@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'cloudinary_storage',  # Primary storage handler component
     'cloudinary',
     'users',
     'projects',
@@ -99,7 +100,7 @@ if os.environ.get('DATABASE_URL'):
 
 
 # ==============================================================================
-# STATIC & MEDIA FILES CONFIGURATION (WhiteNoise / Vercel Aligned)
+# STATIC & MEDIA FILES CONFIGURATION (WhiteNoise & Cloudinary Managed)
 # ==============================================================================
 
 STATIC_URL = '/static/'
@@ -110,21 +111,22 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # Enables WhiteNoise compression and caching for production environments
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Media files - use Cloudinary in production, local filesystem in development
+# Media assets fallback engine mapping configurations
 MEDIA_URL = '/media/'
 
-if os.environ.get('CLOUDINARY_URL'):
-    # Production: Use Cloudinary for media uploads
+# Apply provided production credentials fallback string directly
+CLOUDINARY_STORAGE = {
+    'CLOUDINARY_URL': os.environ.get(
+        'CLOUDINARY_URL', 
+        'cloudinary://813553949787683:6ACOViZygV8ewifaBo4_LMbjC8s@djmjge5xu'
+    )
+}
+
+# Auto-detect Cloudinary state hook execution loop
+if os.environ.get('CLOUDINARY_URL') or CLOUDINARY_STORAGE['CLOUDINARY_URL']:
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-    
-    try:
-        import cloudinary
-        cloudinary.config(secure=True)
-    except Exception as e:
-        print(f"Warning: Cloudinary config failed: {e}")
-        MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 else:
-    # Development: Use local filesystem
     MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
