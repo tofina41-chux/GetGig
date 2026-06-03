@@ -100,33 +100,48 @@ if os.environ.get('DATABASE_URL'):
 
 
 # ==============================================================================
-# STATIC & MEDIA FILES CONFIGURATION (Django 6 Clean Split)
+# STATIC & MEDIA FILES CONFIGURATION (Supabase & WhiteNoise Native Split)
 # ==============================================================================
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
+# Ensure WhiteNoise looks explicitly inside application directories for admin CSS
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+]
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# Force WhiteNoise to deliver your styles cleanly
-STORAGES = {
-    "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
-    },
-}
-
-# Native Cloudinary Credentials mapping
-import cloudinary
-cloudinary.config(
-  cloud_name = "djmjge5xu",
-  api_key = "813553949787683",
-  api_secret = "6ACOViZygV8ewifaBo4_LMbjC8s",
-  secure = True
-)
+# Production vs Local Storage Configuration Switch
+if not DEBUG:
+    # Use WhiteNoise for static files, and Supabase for user file uploads in production
+    STORAGES = {
+        "default": {
+            "BACKEND": "django_supabase_storage.storage.SupabaseStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+        },
+    }
+    
+    # Supabase Credentials Configuration
+    # Replace these strings with your actual project keys from your Supabase Dashboard Settings
+    SUPABASE_URL = "https://your-supabase-project-id.supabase.co"
+    SUPABASE_KEY = "your-supabase-anon-or-service-role-key"
+    SUPABASE_BUCKET = "getgig-media"
+else:
+    # Standard local filesystem fallback for fast local development
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
 
 # ==============================================================================
 # AUTHENTICATION & CORE POLICIES
