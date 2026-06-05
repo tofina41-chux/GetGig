@@ -16,10 +16,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY & ENVIRONMENT CONFIGURATION
 # ==============================================================================
 
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-m&d3^8v$51_9c!r0_f#k+u(z)w@q=e7xb2p%o*jla-n6h4s')
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG_ENV = os.environ.get('DJANGO_DEBUG')
 if DEBUG_ENV is None:
     DEBUG = True
@@ -48,10 +46,9 @@ INSTALLED_APPS = [
     'pwa',
 ]
 
-# MIDDLEWARE check - Ensure WhiteNoise is directly below SecurityMiddleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware', # Must be here
+    'whitenoise.middleware.WhiteNoiseMiddleware', # Must be here to intercept static assets
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -127,11 +124,10 @@ if not DEBUG:
         },
     }
     
-    # Supabase Credentials Configuration
-    # Replace these strings with your actual project keys from your Supabase Dashboard Settings
-    SUPABASE_URL = "https://your-supabase-project-id.supabase.co"
-    SUPABASE_KEY = "your-supabase-anon-or-service-role-key"
-    SUPABASE_BUCKET = "getgig-media"
+    # Supabase Credentials Configuration pulled securely via environment variables
+    SUPABASE_URL = os.environ.get("SUPABASE_URL", "https://your-project.supabase.co")
+    SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "your-anon-key")
+    SUPABASE_BUCKET = os.environ.get("SUPABASE_BUCKET", "getgig-media")
 else:
     # Standard local filesystem fallback for fast local development
     STORAGES = {
@@ -181,11 +177,11 @@ PWA_APP_START_URL = '/'
 PWA_APP_STATUS_BAR_COLOR = 'default'
 PWA_APP_ICONS = [
     {
-        'src': '/static/images/logo.jpg',
-        'sizes': '160x160'
+        'src': '/static/images/icons/icon-192x192.png',
+        'sizes': '192x192'
     },
     {
-        'src': '/static/images/logo.jpg',
+        'src': '/static/images/icons/icon-512x512.png',
         'sizes': '512x512'
     }
 ]
