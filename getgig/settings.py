@@ -25,7 +25,8 @@ else:
     DEBUG = DEBUG_ENV == 'True'
 
 # Allow Vercel URLs and local development environments
-ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '127.0.0.1,localhost,.vercel.app').split(',')
+# Pattern starting with . matches subdomains (e.g., .vercel.app matches anything.vercel.app)
+ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1,.vercel.app').split(',')
 
 
 # ==============================================================================

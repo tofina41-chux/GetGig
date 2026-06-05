@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "buildCommand": "python manage.py collectstatic --noinput",
   "builds": [
     {
       "src": "getgig/wsgi.py",
@@ -10,10 +11,6 @@
       }
     }
   ],
-  "env": {
-    "DJANGO_DEBUG": "False"
-  },
-  "buildCommand": "python manage.py collectstatic --noinput",
   "routes": [
     {
       "src": "/static/(.*)",
