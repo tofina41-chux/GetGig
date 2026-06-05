@@ -10,7 +10,7 @@ django-storages==1.14.6
 gunicorn==26.0.0
 idna==3.18
 packaging==26.2
-pillow==12.2.0
+pillow
 psycopg2-binary==2.9.12
 requests==2.34.2
 six==1.17.0
@@ -18,4 +18,4 @@ sqlparse==0.5.5
 tzdata==2026.2
 urllib3==2.7.0
 whitenoise==6.12.0
-django-supabase-storage==0.1.2
+django-supabase-storage
