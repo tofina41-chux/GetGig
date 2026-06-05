@@ -10,6 +10,10 @@
       }
     }
   ],
+  "env": {
+    "DJANGO_DEBUG": "False"
+  },
+  "buildCommand": "python manage.py collectstatic --noinput",
   "routes": [
     {
       "src": "/static/(.*)",
