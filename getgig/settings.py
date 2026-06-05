@@ -34,6 +34,7 @@ ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1,.ver
 # ==============================================================================
 
 INSTALLED_APPS = [
+    'jazzmin',  # Modern admin interface - must be before django.contrib.admin
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -115,31 +116,16 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Production vs Local Storage Configuration Switch
 if not DEBUG:
-    # Use WhiteNoise for static files, and Supabase for user file uploads in production
-    # But fallback to filesystem if Supabase is not fully configured
-    if os.environ.get("SUPABASE_URL") and os.environ.get("SUPABASE_KEY"):
-        STORAGES = {
-            "default": {
-                "BACKEND": "django_supabase_storage.storage.SupabaseStorage",
-            },
-            "staticfiles": {
-                "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
-            },
-        }
-        # Supabase Credentials Configuration pulled securely via environment variables
-        SUPABASE_URL = os.environ.get("SUPABASE_URL")
-        SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
-        SUPABASE_BUCKET = os.environ.get("SUPABASE_BUCKET", "getgig-media")
-    else:
-        # Fallback to filesystem if Supabase not configured
-        STORAGES = {
-            "default": {
-                "BACKEND": "django.core.files.storage.FileSystemStorage",
-            },
-            "staticfiles": {
-                "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
-            },
-        }
+    # On Vercel/Production, use filesystem storage (no persistence, but simple)
+    # For persistent file uploads, consider using Cloudinary (already installed)
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+        },
+    }
 else:
     # Standard local filesystem fallback for fast local development
     STORAGES = {
