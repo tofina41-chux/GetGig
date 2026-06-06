@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles', # WhiteNoise reads directly from this now
-    'cloudinary',                 # Official SDK backend
+    'cloudinary_storage',         # Cloudinary for image uploads
+    'cloudinary',                 # Cloudinary SDK
     'users',
     'projects',
     'storages',
@@ -116,18 +117,17 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Production vs Local Storage Configuration Switch
 if not DEBUG:
-    # On Vercel/Production, use filesystem storage (no persistence, but simple)
-    # For persistent file uploads, consider using Cloudinary (already installed)
+    # On Vercel/Production, use Cloudinary for media (persistent, serverless-friendly)
     STORAGES = {
         "default": {
-            "BACKEND": "django.core.files.storage.FileSystemStorage",
+            "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
         },
         "staticfiles": {
             "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
         },
     }
 else:
-    # Standard local filesystem fallback for fast local development
+    # Local development uses filesystem
     STORAGES = {
         "default": {
             "BACKEND": "django.core.files.storage.FileSystemStorage",
@@ -136,6 +136,14 @@ else:
             "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
         },
     }
+
+# Cloudinary Configuration (credentials pulled from environment variables)
+import cloudinary
+cloudinary.config(
+    cloud_name=os.environ.get("CLOUDINARY_CLOUD_NAME"),
+    api_key=os.environ.get("CLOUDINARY_API_KEY"),
+    api_secret=os.environ.get("CLOUDINARY_API_SECRET"),
+)
 
 # ==============================================================================
 # AUTHENTICATION & CORE POLICIES

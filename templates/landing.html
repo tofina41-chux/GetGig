@@ -57,25 +57,7 @@
             {% if config.hero_image %}
                 <img src="{{ config.hero_image.url }}" alt="GetGig platform preview" class="w-full max-w-[500px] mx-auto rounded-[3rem] shadow-2xl transform rotate-2 hover:rotate-0 transition-transform duration-500">
             {% else %}
-                <div class="w-full max-w-[500px] mx-auto rounded-[3rem] border border-gray-200 bg-gradient-to-br from-[#e2f5f4] to-[#eef6ff] p-10 shadow-2xl dark:border-slate-700 dark:from-slate-800 dark:to-slate-900">
-                    <div class="flex h-full flex-col justify-between rounded-[2.5rem] bg-white p-8 shadow-lg dark:bg-slate-900">
-                        <div>
-                            <div class="inline-flex items-center rounded-full bg-ocean/10 px-3 py-1 text-sm font-semibold text-ocean">GetGig Preview</div>
-                            <h2 class="mt-8 text-3xl font-bold text-gray-900 dark:text-slate-100">Launch your first premium gig</h2>
-                            <p class="mt-4 text-gray-600 dark:text-slate-300">Use the Django admin to update hero imagery, copy, and landing page details without changing code.</p>
-                        </div>
-                        <div class="mt-8 space-y-4">
-                            <div class="rounded-3xl bg-slate-50 p-5 dark:bg-slate-900">
-                                <p class="text-sm font-semibold text-gray-800 dark:text-slate-100">Clear requirements</p>
-                                <p class="text-sm text-gray-500 dark:text-slate-400">Tell freelancers exactly what you need.</p>
-                            </div>
-                            <div class="rounded-3xl bg-slate-50 p-5 dark:bg-slate-900">
-                                <p class="text-sm font-semibold text-gray-800 dark:text-slate-100">Faster hiring</p>
-                                <p class="text-sm text-gray-500 dark:text-slate-400">Review proposals in one streamlined dashboard.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <img src="{% static 'images/hero.svg' %}" alt="GetGig hero" class="w-full max-w-[600px] mx-auto rounded-[3rem] shadow-2xl">
             {% endif %}
         </div>
     </div>
