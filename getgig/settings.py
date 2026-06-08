@@ -116,23 +116,38 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Cloudinary Configuration (credentials pulled from environment variables)
+# Cloudinary can be configured two ways, and Vercel/hosting providers may set
+# either one:
+#   1. A single CLOUDINARY_URL of the form
+#      cloudinary://<api_key>:<api_secret>@<cloud_name>
+#   2. Three separate vars: CLOUDINARY_CLOUD_NAME / API_KEY / API_SECRET
+CLOUDINARY_URL = os.environ.get("CLOUDINARY_URL")
 CLOUDINARY_CLOUD_NAME = os.environ.get("CLOUDINARY_CLOUD_NAME")
 CLOUDINARY_API_KEY = os.environ.get("CLOUDINARY_API_KEY")
 CLOUDINARY_API_SECRET = os.environ.get("CLOUDINARY_API_SECRET")
 
-# Cloudinary is only usable when all three credentials are present. The
-# cloudinary_storage backend raises ImproperlyConfigured at import time if they
-# are missing, which would crash the whole app on boot (e.g. on Vercel without
-# the env vars set). So we only enable it when fully configured.
-USE_CLOUDINARY = all([CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET])
+# Cloudinary is usable when EITHER the single URL is present OR all three
+# separate credentials are present. The cloudinary_storage backend raises
+# ImproperlyConfigured at import time if it can't find any of these, which would
+# crash the whole app on boot. More importantly, if we incorrectly think
+# Cloudinary is unavailable we fall back to the local filesystem, which is
+# read-only on Vercel and makes every media upload return a 500.
+USE_CLOUDINARY = bool(CLOUDINARY_URL) or all(
+    [CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET]
+)
 
 if USE_CLOUDINARY:
     import cloudinary
-    cloudinary.config(
-        cloud_name=CLOUDINARY_CLOUD_NAME,
-        api_key=CLOUDINARY_API_KEY,
-        api_secret=CLOUDINARY_API_SECRET,
-    )
+    # When CLOUDINARY_URL is set, the SDK auto-parses it. We only pass explicit
+    # kwargs when relying on the three separate variables.
+    if CLOUDINARY_URL:
+        cloudinary.config()
+    else:
+        cloudinary.config(
+            cloud_name=CLOUDINARY_CLOUD_NAME,
+            api_key=CLOUDINARY_API_KEY,
+            api_secret=CLOUDINARY_API_SECRET,
+        )
 
 # Production vs Local Storage Configuration Switch
 if not DEBUG:
