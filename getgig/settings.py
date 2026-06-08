@@ -115,12 +115,37 @@ STATICFILES_FINDERS = [
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+# Cloudinary Configuration (credentials pulled from environment variables)
+CLOUDINARY_CLOUD_NAME = os.environ.get("CLOUDINARY_CLOUD_NAME")
+CLOUDINARY_API_KEY = os.environ.get("CLOUDINARY_API_KEY")
+CLOUDINARY_API_SECRET = os.environ.get("CLOUDINARY_API_SECRET")
+
+# Cloudinary is only usable when all three credentials are present. The
+# cloudinary_storage backend raises ImproperlyConfigured at import time if they
+# are missing, which would crash the whole app on boot (e.g. on Vercel without
+# the env vars set). So we only enable it when fully configured.
+USE_CLOUDINARY = all([CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET])
+
+if USE_CLOUDINARY:
+    import cloudinary
+    cloudinary.config(
+        cloud_name=CLOUDINARY_CLOUD_NAME,
+        api_key=CLOUDINARY_API_KEY,
+        api_secret=CLOUDINARY_API_SECRET,
+    )
+
 # Production vs Local Storage Configuration Switch
 if not DEBUG:
-    # On Vercel/Production, use Cloudinary for media (persistent, serverless-friendly)
+    # In production, prefer WhiteNoise's compressed manifest storage for static
+    # assets. Use Cloudinary for media uploads only when it's configured,
+    # otherwise fall back to the local filesystem so the app still boots.
     STORAGES = {
         "default": {
-            "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+            "BACKEND": (
+                "cloudinary_storage.storage.MediaCloudinaryStorage"
+                if USE_CLOUDINARY
+                else "django.core.files.storage.FileSystemStorage"
+            ),
         },
         "staticfiles": {
             "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
@@ -136,14 +161,6 @@ else:
             "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
         },
     }
-
-# Cloudinary Configuration (credentials pulled from environment variables)
-import cloudinary
-cloudinary.config(
-    cloud_name=os.environ.get("CLOUDINARY_CLOUD_NAME"),
-    api_key=os.environ.get("CLOUDINARY_API_KEY"),
-    api_secret=os.environ.get("CLOUDINARY_API_SECRET"),
-)
 
 # ==============================================================================
 # AUTHENTICATION & CORE POLICIES
@@ -167,6 +184,33 @@ LOGIN_REDIRECT_URL = 'users:dashboard_redirect'
 LOGOUT_REDIRECT_URL = 'login'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+
+# ==============================================================================
+# PRODUCTION SECURITY HARDENING (only applied when DEBUG is off)
+# ==============================================================================
+
+if not DEBUG:
+    # Vercel terminates TLS and forwards the original protocol in this header.
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    # Trust the Vercel deployment domain(s) for CSRF on form submissions.
+    # A leading-dot host (e.g. ".vercel.app") becomes a wildcard origin.
+    CSRF_TRUSTED_ORIGINS = []
+    for h in ALLOWED_HOSTS:
+        if h in ('localhost', '127.0.0.1'):
+            continue
+        if h.startswith('http'):
+            CSRF_TRUSTED_ORIGINS.append(h)
+        elif h.startswith('.'):
+            CSRF_TRUSTED_ORIGINS.append(f'https://*{h}')
+        else:
+            CSRF_TRUSTED_ORIGINS.append(f'https://{h}')
 
 
 # ==============================================================================
