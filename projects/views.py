@@ -56,6 +56,28 @@ def create_project(request):
             raw_reqs = form.cleaned_data.get('requirements', '')
             project.requirements = [r.strip() for r in raw_reqs.split(',') if r.strip()]
             project.save()
+           # Fetch all user emails where user_type is 'freelancer'
+            from django.contrib.auth import get_user_model
+            from .utils import send_email_background
+            User = get_user_model()
+            
+            freelancer_emails = list(
+                User.objects.filter(user_type='freelancer')
+                .exclude(email='')
+                .values_list('email', flat=True)
+            )
+            
+            # Send blast alert if freelancers exist
+            if freelancer_emails:
+                subject = f"🔥 New Gig Posted: {project.title}"
+                message = (
+                    f"Hey there!\n\n"
+                    f"A premium new gig has just been posted on GetGig: '{project.title}'\n"
+                    f"Budget: ${project.budget}\n\n"
+                    f"Head over to your freelancer dashboard right now to check out the requirements and submit your bid!"
+                )
+                send_email_background(subject, message, freelancer_emails)
+
             messages.success(request, "Project posted!")
             return redirect('projects:client_dashboard')
     else:
@@ -133,13 +155,20 @@ def apply_to_project(request, project_id):
                 user=project.client,
                 message=f"New application for '{project.title}'."
             )
+            # 2. Asynchronous Email Alert to Client
+            from .utils import send_email_background
+            subject = f" New Applicant for your gig: {project.title}"
+            message = (
+                f"Hello {project.client.username},\n\n"
+                f"{request.user.username} has just applied to your project '{project.title}'.\n"
+                f"Bid Amount: ${application.bid_amount}\n\n"
+                f"Log in to GetGig to review their pitch and profile details!"
+            )
+            if project.client.email:
+                send_email_background(subject, message, [project.client.email])
+            
             messages.success(request, "Application submitted successfully!")
             return redirect('projects:freelancer_dashboard')
-    else:
-        form = ApplicationForm()
-        
-    return render(request, 'freelancers/apply.html', {'form': form, 'project': project})
-
 @login_required
 def vet_application(request, application_id=None, app_id=None, status=None):
     """
