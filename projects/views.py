@@ -70,6 +70,7 @@ def edit_project(request, project_id):
         if form.is_valid():
             raw_reqs = form.cleaned_data.get('requirements', '')
             project.requirements = [r.strip() for r in raw_reqs.split(',') if r.strip()]
+            project.applications.exclude(status='archived').update(status='archived')
             form.save()
             return redirect('projects:client_dashboard')
     else:
@@ -86,7 +87,14 @@ def delete_project(request, project_id):
 @login_required
 def toggle_project_status(request, project_id):
     project = get_object_or_404(Project, id=project_id, client=request.user)
-    project.status = 'ended' if project.status == 'active' else 'active'
+    
+    if project.status == 'active':
+        project.status = 'closed'
+    else:
+        project.status = 'active'
+        # Feature: Archive past applications so freelancers can re-apply for this new phase!
+        project.applications.filter(status__in=['pending', 'accepted', 'rejected']).update(status='archived')
+        
     project.save()
     return redirect('projects:client_dashboard')
 
@@ -98,8 +106,14 @@ def apply_to_project(request, project_id):
     if request.user.user_type != 'freelancer':
         return redirect('projects:client_dashboard')
 
-    if Application.objects.filter(project=project, freelancer=request.user).exists():
-        messages.info(request, "Already applied.")
+    # Change: Check for existing applications but ignore old archived rounds
+    has_active_application = Application.objects.filter(
+        project=project, 
+        freelancer=request.user
+    ).exclude(status='archived').exists()
+
+    if has_active_application:
+        messages.info(request, "Already applied to the current active round.")
         return redirect('projects:freelancer_dashboard')
 
     if not project.can_apply:
@@ -114,13 +128,16 @@ def apply_to_project(request, project_id):
             application.freelancer = request.user
             application.met_requirements = request.POST.getlist('met_requirements')
             application.save()
+            
             Notification.objects.create(
                 user=project.client,
                 message=f"New application for '{project.title}'."
             )
+            messages.success(request, "Application submitted successfully!")
             return redirect('projects:freelancer_dashboard')
     else:
         form = ApplicationForm()
+        
     return render(request, 'freelancers/apply.html', {'form': form, 'project': project})
 
 @login_required

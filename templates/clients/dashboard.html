@@ -15,7 +15,6 @@
     {% for project in projects %}
         <div class="bg-white dark:bg-slate-900 rounded-[2rem] shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden hover:shadow-md transition-shadow">
             
-            <!-- Project Header -->
             <div class="p-8 bg-slate-50/50 dark:bg-slate-950 border-b border-gray-100 dark:border-slate-700 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div class="flex items-center space-x-4">
                     {% if project.image %}
@@ -24,8 +23,8 @@
                     <div>
                         <h3 class="text-2xl font-bold text-gray-900 dark:text-slate-100">{{ project.title }}</h3>
                         <div class="flex space-x-3 mt-1">
-                            <span class="text-xs font-bold {% if project.status == 'active' %}text-mint{% else %}text-red-400{% endif %} uppercase">
-                                {{ project.status }}
+                            <span class="text-xs font-bold {% if project.status == 'active' and not project.is_ended %}text-mint{% else %}text-red-400{% endif %} uppercase">
+                                {% if project.is_ended and project.status == 'active' %}Ended (Expired){% else %}{{ project.status }}{% endif %}
                             </span>
                             <span class="text-xs text-gray-400 dark:text-slate-400 font-medium">Posted {{ project.created_at|date:"M d" }}</span>
                         </div>
@@ -36,18 +35,29 @@
                     </div>
                 </div>
 
-                <!-- PROJECT CONTROLS (Top Right) -->
                 <div class="flex items-center space-x-4 bg-white dark:bg-slate-900 p-3 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700">
                     <div class="text-right mr-4 border-r pr-4 border-gray-100 dark:border-slate-700">
                         <p class="text-xl font-black text-gray-900 dark:text-slate-100">${{ project.budget }}</p>
                     </div>
-                    <a href="{% url 'projects:toggle_project_status' project.id %}" class="text-xs font-bold text-gray-500 dark:text-slate-400 hover:text-ocean transition">
-                        {% if project.status == 'active' %}End Gig{% else %}Reactivate{% endif %}
-                    </a>
+                    
+                    {% if project.status == 'ended' or project.deadline < timezone.localdate %}
+                        <span class="text-xs font-black text-red-400 uppercase tracking-wider bg-red-50 dark:bg-red-950/20 px-2.5 py-1 rounded-md">
+                            Deadline Passed
+                        </span>
+                    {% else %}
+                        <a href="{% url 'projects:toggle_project_status' project.id %}" 
+                           class="text-xs font-bold px-3 py-1.5 rounded-xl transition duration-200 
+                                  {% if project.status == 'active' %}
+                                      bg-red-50 text-red-500 hover:bg-red-100 dark:bg-red-950/30 dark:text-red-400
+                                  {% else %}
+                                      bg-mint/10 text-mint hover:bg-mint/20
+                                  {% endif %}">
+                            {% if project.status == 'active' %}Close Early{% else %}Reopen Gig{% endif %}
+                        </a>
+                    {% endif %}
                 </div>
             </div>
 
-            <!-- Proposals Section -->
             <div class="p-8">
                 <h4 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-6">
                     Applicants ({{ project.applications.count }})
@@ -58,7 +68,6 @@
                         <div class="p-6 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-700 rounded-2xl transition-all">
                             <div class="flex flex-col md:flex-row items-start justify-between">
                                 <div class="flex-grow">
-                                    <!-- Freelancer Identity -->
                                     <div class="flex items-center space-x-3 mb-4">
                                         <div class="w-10 h-10 rounded-full bg-ocean/10 text-ocean flex items-center justify-center font-bold">
                                             {{ app.freelancer.username|first|upper }}
@@ -69,7 +78,6 @@
                                         </div>
                                     </div>
 
-                                    <!-- REQUIREMENTS COMPARISON -->
                                     <div class="mb-6 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 bg-gray-50 dark:bg-slate-900 p-4 rounded-xl border border-gray-100 dark:border-slate-700">
                                         {% for req in project.requirements %}
                                             <div class="flex items-center text-xs">
@@ -88,7 +96,6 @@
                                         {% endfor %}
                                     </div>
 
-                                    <!-- READ MORE / PROFILE INFO -->
                                     <details class="group">
                                         <summary class="list-none cursor-pointer text-ocean text-xs font-bold uppercase tracking-wider flex items-center">
                                             <span>Read Pitch & Profile</span>
@@ -104,7 +111,6 @@
                                     </details>
                                 </div>
                                 
-                                <!-- APPROVAL LOGIC -->
                                 <div class="mt-4 md:mt-0 md:ml-6 flex items-center space-x-3">
                                     {% if app.status == 'pending' %}
                                         <a href="{% url 'projects:vet_application' app.id 'approved' %}" class="bg-mint text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-md shadow-emerald-100 hover:scale-105 transition">Approve</a>

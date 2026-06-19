@@ -46,16 +46,18 @@
                         <p class="text-xs text-gray-400">Deadline: {{ project.deadline|date:"M d, Y" }}</p>
                     </div>
                     {% if project.can_apply %}
-                        <a href="{% url 'projects:apply_to_project' project.id %}" 
-                           class="inline-flex items-center text-sm font-black text-ocean group-hover:translate-x-1 transition-transform">
-                            Apply Now
-                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg>
-                        </a>
-                    {% else %}
-                        <span class="inline-flex items-center px-4 py-2 text-sm font-black text-gray-500 dark:text-slate-300 bg-gray-100 dark:bg-slate-800 rounded-2xl uppercase">
-                            Applications closed
-                        </span>
-                    {% endif %}
+    <span class="text-xs font-bold text-mint uppercase">Open</span>
+    
+    <a href="{% url 'projects:apply_to_project' project.id %}" class="bg-ocean text-white px-4 py-2 rounded-xl text-sm font-bold">
+        Apply Now
+    </a>
+{% else %}
+    <span class="text-xs font-bold text-red-400 uppercase">Applications Closed</span>
+    
+    <button disabled class="bg-gray-200 dark:bg-slate-800 text-gray-400 px-4 py-2 rounded-xl text-sm font-bold cursor-not-allowed">
+        Closed
+    </button>
+{% endif %}
                 </div>
             </div>
         </div>

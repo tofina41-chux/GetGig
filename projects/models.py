@@ -12,30 +12,38 @@ class Project(models.Model):
     
     # Standard ImageField handled dynamically by Pillow + Supabase
     image = models.ImageField(upload_to='project_images/', blank=True, null=True)
-    
     requirements = models.JSONField(default=list, blank=True)
+    
+    # Adding 'closed' choice to give clients manual control
     status = models.CharField(
         max_length=20, 
-        choices=[('active', 'Active'), ('ended', 'Ended')], 
+        choices=[('active', 'Active'), ('closed', 'Closed Early'), ('ended', 'Ended')], 
         default='active'
     )
 
     @property
     def is_ended(self):
-        return self.status == 'ended' or self.deadline < timezone.localdate()
+        """Gigs are closed if manually set to 'ended'/'closed' or if deadline has passed."""
+        if self.status in ['ended', 'closed']:
+            return True
+        return self.deadline < timezone.localdate()
+
+    @property
+    def can_apply(self):
+        """A freelancer can apply only if the gig has NOT ended/closed."""
+        return not self.is_ended
 
     @property
     def days_until_deadline(self):
-        return (self.deadline - timezone.localdate()).days
-
-    def __str__(self):
-        return self.title
+        days = (self.deadline - timezone.localdate()).days
+        return max(0, days)
 
 class Application(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('accepted', 'Accepted'),
         ('rejected', 'Rejected'),
+        ('archived', 'Archived / Past Round'),
     ]
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='applications')
     freelancer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -48,12 +56,11 @@ class Application(models.Model):
     def __str__(self):
         return f"{self.freelancer.username} - {self.project.title}"
 
+
 class SiteConfiguration(models.Model):
     site_name = models.CharField(max_length=100, default="GetGig")
     hero_title = models.CharField(max_length=255, default="A better way to hire and work with elite freelance talent.")
     hero_subtitle = models.TextField(default="Post premium gigs, match with qualified freelancers, and manage proposals all in one place.")
-    
-    # Clean Image field mapping
     hero_image = models.ImageField(upload_to='site_assets/', blank=True, null=True)
 
     class Meta:
