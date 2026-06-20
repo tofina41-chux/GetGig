@@ -10,10 +10,14 @@
       }
     }
   ],
+  "env": {
+    "DATABASE_URL": "@POSTGRES_URL"
+  },
   "routes": [
     {
       "src": "/static/(.*)",
-      "dest": "static/$1"
+      "dest": "getgig/static/$1",
+      "continue": true
     },
     {
       "src": "/(.*)",
