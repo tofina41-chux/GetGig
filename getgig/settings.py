@@ -32,6 +32,7 @@ ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1,.ver
 # APPLICATION DEFINITION (Admin-Free Minimal Core)
 # ==============================================================================
 
+
 INSTALLED_APPS = [
     # 'jazzmin',                  <-- REMOVED NATIVELY
     # 'django.contrib.admin',     <-- REMOVED NATIVELY
