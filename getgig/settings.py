@@ -31,8 +31,6 @@ ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1,.ver
 # ==============================================================================
 # APPLICATION DEFINITION (Admin-Free Minimal Core)
 # ==============================================================================
-
-
 INSTALLED_APPS = [
     # 'jazzmin',                  <-- REMOVED NATIVELY
     # 'django.contrib.admin',     <-- REMOVED NATIVELY
@@ -90,8 +88,18 @@ DATABASES = {
     }
 }
 
-if os.environ.get('DATABASE_URL'):
+# Check for production individual keys injected by the Vercel integration
+if os.environ.get('POSTGRES_HOST'):
+    db_user = os.environ.get('POSTGRES_USER')
+    db_password = os.environ.get('POSTGRES_PASSWORD')
+    db_host = os.environ.get('POSTGRES_HOST')
+    db_database = os.environ.get('POSTGRES_DATABASE')
+    
+    # Construct a valid PostgreSQL connection URL manually
+    constructed_url = f"postgres://{db_user}:{db_password}@{db_host}/{db_database}"
+    
     DATABASES['default'] = dj_database_url.config(
+        default=constructed_url,
         conn_max_age=600, 
         ssl_require=True
     )
