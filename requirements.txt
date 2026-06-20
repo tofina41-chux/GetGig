@@ -3,3 +3,5 @@ pillow>=10.0
 supabase>=2.0
 django-storages>=1.14
 whitenoise>=6.0.0
+dj-database_url>=2.0.0
+psycopg2-binary>=2.9.0
