@@ -130,7 +130,7 @@ if not DEBUG:
     # On Vercel, store media payloads in Supabase Storage Buckets
     STORAGES = {
         "default": {
-            "BACKEND": "django_supabase_storage.storage.SupabaseStorage",
+            "BACKEND": "django_supabase_storage.storage_backends.SupabaseStorage",
         },
         "staticfiles": {
             "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
