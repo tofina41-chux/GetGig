@@ -90,10 +90,12 @@ DATABASES = {
 
 # Check for production individual keys injected by the Vercel integration
 if os.environ.get('POSTGRES_HOST'):
-    db_user = os.environ.get('POSTGRES_USER')
-    db_password = os.environ.get('POSTGRES_PASSWORD')
+    from urllib.parse import quote
+
+    db_user = quote(os.environ.get('POSTGRES_USER', ''), safe='')
+    db_password = quote(os.environ.get('POSTGRES_PASSWORD', ''), safe='')
     db_host = os.environ.get('POSTGRES_HOST')
-    db_database = os.environ.get('POSTGRES_DATABASE')
+    db_database = quote(os.environ.get('POSTGRES_DATABASE', ''), safe='')
     # Supabase's direct connection (db.<ref>.supabase.co) only resolves to IPv6,
     # which Vercel's serverless functions cannot reach. Use the Supavisor
     # Transaction pooler instead (host: aws-0-<region>.pooler.supabase.com),
@@ -101,7 +103,12 @@ if os.environ.get('POSTGRES_HOST'):
     # That pooler runs on port 6543, not the Postgres default of 5432.
     db_port = os.environ.get('POSTGRES_PORT', '6543')
 
-    # Construct a valid PostgreSQL connection URL manually
+    # Construct a valid PostgreSQL connection URL manually.
+    # user/password/database are URL-encoded above because Postgres passwords
+    # commonly contain characters like # / @ : that are reserved in URLs -
+    # left unencoded, a password containing '#' silently truncates the whole
+    # URL at that point, which previously caused authentication to fail
+    # with an empty username and password.
     constructed_url = f"postgres://{db_user}:{db_password}@{db_host}:{db_port}/{db_database}"
 
     DATABASES['default'] = dj_database_url.config(
