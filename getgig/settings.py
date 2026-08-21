@@ -94,10 +94,16 @@ if os.environ.get('POSTGRES_HOST'):
     db_password = os.environ.get('POSTGRES_PASSWORD')
     db_host = os.environ.get('POSTGRES_HOST')
     db_database = os.environ.get('POSTGRES_DATABASE')
-    
+    # Supabase's direct connection (db.<ref>.supabase.co) only resolves to IPv6,
+    # which Vercel's serverless functions cannot reach. Use the Supavisor
+    # Transaction pooler instead (host: aws-0-<region>.pooler.supabase.com),
+    # which is IPv4-compatible and is what Supabase recommends for serverless.
+    # That pooler runs on port 6543, not the Postgres default of 5432.
+    db_port = os.environ.get('POSTGRES_PORT', '6543')
+
     # Construct a valid PostgreSQL connection URL manually
-    constructed_url = f"postgres://{db_user}:{db_password}@{db_host}/{db_database}"
-    
+    constructed_url = f"postgres://{db_user}:{db_password}@{db_host}:{db_port}/{db_database}"
+
     DATABASES['default'] = dj_database_url.config(
         default=constructed_url,
         conn_max_age=600, 
