@@ -65,6 +65,29 @@
             background-color: #0f766e;
         }
 
+        /* Django's default form.as_p error output has no styling at all by
+           default, which makes real validation failures (wrong password
+           length, mismatched passwords, taken username, etc.) look like
+           the page just silently reloaded. This makes them impossible to miss. */
+        ul.errorlist {
+            list-style: none;
+            margin: 0.35rem 0 0.75rem 0;
+            padding: 0.6rem 0.9rem;
+            background-color: #FEF2F2;
+            border: 1px solid #FCA5A5;
+            border-left: 4px solid #DC2626;
+            border-radius: 0.5rem;
+            color: #B91C1C;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        ul.errorlist li {
+            margin: 0;
+        }
+        ul.errorlist.nonfield {
+            margin-bottom: 1rem;
+        }
+
         /* Add this inside the <style> block of base.html */
 input, select, textarea {
     transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
