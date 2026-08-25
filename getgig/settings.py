@@ -206,7 +206,7 @@ PWA_APP_STATUS_BAR_COLOR = 'default'
 PWA_APP_ICONS = [
     {
         'src': '/static/images/logo.png',
-        'sizes': '160x160'
+        'sizes': '200x200'
     }
 ]
 PWA_APP_DIR = 'ltr'
