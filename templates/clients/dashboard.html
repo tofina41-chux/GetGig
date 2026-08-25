@@ -37,7 +37,7 @@
 
                 <div class="flex items-center space-x-4 bg-white dark:bg-slate-900 p-3 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700">
                     <div class="text-right mr-4 border-r pr-4 border-gray-100 dark:border-slate-700">
-                        <p class="text-xl font-black text-gray-900 dark:text-slate-100">${{ project.budget }}</p>
+                        <p class="text-xl font-black text-gray-900 dark:text-slate-100">KSh {{ project.budget }}</p>
                     </div>
                     
                     {% if project.status == 'ended' or project.deadline < timezone.localdate %}
@@ -74,7 +74,7 @@
                                         </div>
                                         <div>
                                             <span class="font-bold text-gray-800 dark:text-slate-100">{{ app.freelancer.username }}</span>
-                                            <span class="ml-2 text-xs font-bold text-mint bg-mint/5 px-2 py-1 rounded-md">Bid: ${{ app.bid_amount }}</span>
+                                            <span class="ml-2 text-xs font-bold text-mint bg-mint/5 px-2 py-1 rounded-md">Bid: KSh {{ app.bid_amount }}</span>
                                         </div>
                                     </div>
 

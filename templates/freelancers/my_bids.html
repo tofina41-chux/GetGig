@@ -21,7 +21,7 @@
                     <span class="px-3 py-1 bg-blue-50 text-ocean text-xs font-bold rounded-full uppercase">Pending</span>
                 {% endif %}
             </div>
-            <p class="text-gray-500 dark:text-slate-400 text-sm">Bid Amount: <span class="font-bold text-gray-800 dark:text-slate-100">${{ bid.bid_amount }}</span> • Submitted {{ bid.created_at|timesince }} ago</p>
+            <p class="text-gray-500 dark:text-slate-400 text-sm">Bid Amount: <span class="font-bold text-gray-800 dark:text-slate-100">KSh {{ bid.bid_amount }}</span> • Submitted {{ bid.created_at|timesince }} ago</p>
         </div>
         
         <div class="mt-4 md:mt-0">

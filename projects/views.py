@@ -73,7 +73,7 @@ def create_project(request):
                 message = (
                     f"Hey there!\n\n"
                     f"A premium new gig has just been posted on GetGig: '{project.title}'\n"
-                    f"Budget: ${project.budget}\n\n"
+                    f"Budget: KSh {project.budget}\n\n"
                     f"Head over to your freelancer dashboard right now to check out the requirements and submit your bid!"
                 )
                 send_email_background(subject, message, freelancer_emails)
@@ -161,7 +161,7 @@ def apply_to_project(request, project_id):
             message = (
                 f"Hello {project.client.username},\n\n"
                 f"{request.user.username} has just applied to your project '{project.title}'.\n"
-                f"Bid Amount: ${application.bid_amount}\n\n"
+                f"Bid Amount: KSh {application.bid_amount}\n\n"
                 f"Log in to GetGig to review their pitch and profile details!"
             )
             if project.client.email:
