@@ -205,7 +205,7 @@ PWA_APP_STATUS_BAR_COLOR = 'default'
 # Aligned directly to map with your custom loaded branding logos
 PWA_APP_ICONS = [
     {
-        'src': '/static/images/logo.jpg',
+        'src': '/static/images/logo.png',
         'sizes': '160x160'
     }
 ]
