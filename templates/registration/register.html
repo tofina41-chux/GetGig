@@ -11,4 +11,30 @@
         Already have an account? <a href="{% url 'login' %}" class="text-ocean font-semibold">Login</a>
     </p>
 </div>
+
+<script>
+    // Registration happens before user_type is known server-side, so the
+    // "Company name" (client-only) and "Skills" (freelancer-only) fields
+    // can't be filtered out ahead of time the way ProfileUpdateForm does
+    // after signup. This shows only the relevant one based on the current
+    // selection, and updates live if the user changes their mind.
+    (function () {
+        var userTypeField = document.getElementById('id_user_type');
+        var companyField = document.getElementById('id_company_name');
+        var skillsField = document.getElementById('id_skills');
+        if (!userTypeField || !companyField || !skillsField) return;
+
+        var companyWrapper = companyField.closest('p') || companyField.parentElement;
+        var skillsWrapper = skillsField.closest('p') || skillsField.parentElement;
+
+        function updateVisibility() {
+            var isClient = userTypeField.value === 'client';
+            companyWrapper.style.display = isClient ? '' : 'none';
+            skillsWrapper.style.display = isClient ? 'none' : '';
+        }
+
+        userTypeField.addEventListener('change', updateVisibility);
+        updateVisibility();
+    })();
+</script>
 {% endblock %}

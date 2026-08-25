@@ -169,6 +169,11 @@ def apply_to_project(request, project_id):
             
             messages.success(request, "Application submitted successfully!")
             return redirect('projects:freelancer_dashboard')
+        # form.is_valid() was False - fall through to re-render with errors below
+    else:
+        form = ApplicationForm()
+
+    return render(request, 'freelancers/apply.html', {'form': form, 'project': project})
 @login_required
 def vet_application(request, application_id=None, app_id=None, status=None):
     """
